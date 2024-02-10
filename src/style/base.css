@@ -1,0 +1,82 @@
+* {
+    padding: 0;
+    margin: 0;
+}
+
+html {
+    height: 100%;
+    width: 100%;
+    font-family: 'SourceHanSansCNRegular';
+    /* 1rem = 80 */
+}
+
+li {
+    list-style: none;
+}
+
+a {
+    display: block;
+    color: black;
+    text-decoration: none;
+}
+
+img {
+    width: 100%;
+}
+
+@font-face {
+    font-family: 'SourceHanSansCNRegular';
+    src: url('../assets/font/SourceHanSansCN-Regular.otf');
+}
+
+@font-face {
+    font-family: 'PlusJakartaSansRegular';
+    src: url('../assets/font/PlusJakartaSans-Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'PlusJakartaSansBlod';
+    src: url('../assets/font/PlusJakartaSans-Bold.ttf') format('truetype');
+}
+
+
+header nav >* , footer nav >*{
+    margin-right: 40px;
+}
+
+/* 公共框 */
+.marginBox {
+    padding-left: 10%;
+    padding-right: 10%;
+    box-sizing: border-box;
+}
+
+.marginUp {
+    margin-top: 120px;
+}
+
+.centerBetween {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+footer {
+    padding: 83px 10%;
+}
+
+footer p {
+    color:  #282828;
+    font-family: "Plus Jakarta Sans";
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    letter-spacing: 1.2px;
+}
