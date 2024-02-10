@@ -8,6 +8,9 @@
 
 export default {
     name: 'App',
+    mounted () {
+        document.title = 'HARVEST FLOW'
+    }
 }
 </script>
 
