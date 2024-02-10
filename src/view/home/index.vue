@@ -8,7 +8,7 @@
                 <h3>South East Asia</h3>
             </div>
         </div>
-        <div class="swiperBox marginUp">
+        <div class="swiperBox">
             <div class="swiper">
                 <div class="swiper-wrapper">
                     <div class="swiper-slide"><img src="@/assets/images/silde.png"></div>
@@ -61,11 +61,13 @@
                             and borrowers.
                         </p>
                     </div>
-                    <img src="@/assets/images/image74.png">
+                    <img style="width: 233px;height: 188px;;"
+                         src="@/assets/images/image74.png">
                 </div>
                 <div class="centerBetween">
                     <img src="@/assets/images/image81.png"
-                         style="margin-right: 10px;margin-top: 30px;">
+                         style="margin-right: 30px;margin-top: 30px;width: 126px;
+height: 132px;">
                     <p>
                         But how do we link these real-world assets to the digital space of finance? Through NFTs. Each
                         loan or lease contract is represented as an NFT, turning these agreements into verifiable,
@@ -145,8 +147,10 @@
                     <p class="color2828">0.001 eth per Wallet</p>
                     <div class="total">
                         <h4 class="color999">Total Rewards</h4>
-                        <h3>-<span>ETH</span></h3>
+                        <!-- 这里需要获取一天内的收益 -->
+                        <h3>{{ getEth }}<span>ETH</span></h3>
                     </div>
+                    <!-- todo 这里是sumbit -->
                     <template v-if="isSubmit">
                         <p class="color999"
                            style="margin: 9px 0;">
@@ -214,10 +218,10 @@
                         lending amount.</h3>
                     <p class="color999"
                        style="margin-top: 24px;">LENDING AMOUNT</p>
-                    <h3 class="AMOUNT-H3">100<span>ETH</span></h3>
-                    <el-slider :min="0"
-                               :max="100000"
-                               @change="handleChangeSilder"
+                    <h3 class="AMOUNT-H3">{{value}}<span>ETH</span></h3>
+                    <el-slider :max="1000"
+                               :min="0"
+                               @input="handleChangeSilder"
                                v-model="value">
                     </el-slider>
                     <ul class="SIMULATORlist">
@@ -240,47 +244,13 @@
                         <div class="column">——— Transaction History</div>
                     </div>
                     <ul class="HistoryList">
-                        <li>
+                        <li v-for="(item, index) in HistoryList"
+                            :key="index">
                             <i class="face"><img src="@/assets/images/face.png"></i>
-                            <p>0x344e...676 </p>
-                            <div class="btn">Lend</div>
-                            <h4>0.001 ETH</h4>
-                            <p class="time">1 minute ago</p>
-                        </li>
-                        <li>
-                            <i class="face"><img src="@/assets/images/face.png"></i>
-                            <p>0x344e...676 </p>
-                            <div class="btn">Lend</div>
-                            <h4>0.001 ETH</h4>
-                            <p class="time">1 minute ago</p>
-                        </li>
-                        <li>
-                            <i class="face"><img src="@/assets/images/face.png"></i>
-                            <p>0x344e...676 </p>
-                            <div class="btn">Lend</div>
-                            <h4>0.001 ETH</h4>
-                            <p class="time">1 minute ago</p>
-                        </li>
-                        <li>
-                            <i class="face"><img src="@/assets/images/face.png"></i>
-                            <p>0x344e...676 </p>
-                            <div class="btn">Lend</div>
-                            <h4>0.001 ETH</h4>
-                            <p class="time">1 minute ago</p>
-                        </li>
-                        <li>
-                            <i class="face"><img src="@/assets/images/face.png"></i>
-                            <p>0x344e...676 </p>
-                            <div class="btn">Lend</div>
-                            <h4>0.001 ETH</h4>
-                            <p class="time">1 minute ago</p>
-                        </li>
-                        <li>
-                            <i class="face"><img src="@/assets/images/face.png"></i>
-                            <p>0x344e...676 </p>
-                            <div class="btn">Lend</div>
-                            <h4>0.001 ETH</h4>
-                            <p class="time">1 minute ago</p>
+                            <p>{{ item.idAddress }} </p>
+                            <div class="btn">{{ item.btn }}</div> <!-- 这块 leng 和 HARVEST 展示有区别 -->
+                            <h4>{{ item.num }} ETH</h4>
+                            <p class="time">{{ item.item }}</p>
                         </li>
                     </ul>
                 </div>
@@ -309,6 +279,7 @@
 
 <script>
 import Swiper from 'swiper'
+import { truncateString } from '@/utils/app';
 import isPAYMENT from './components/isPAYMENT'
 import { mapGetters } from 'vuex'
 import Web3 from 'web3';
@@ -330,18 +301,60 @@ export default {
             silderNum: 0,
             currentName: 'LEND',
             isSubmit: true,
-            HistoryList: [],
-            web3: null
+            HistoryList: [{
+                idAddress: '0x123456789122121212121210',
+                btn: 'Lend',
+                num: '0.001 ETH',
+                item: '1 minute ago'
+            }, {
+                idAddress: '0x123456789122121212121210',
+                btn: 'Lend',
+                num: '0.001 ETH',
+                item: '1 minute ago'
+            }, {
+                idAddress: '0x123456789122121212121210',
+                btn: 'Lend',
+                num: '0.001 ETH',
+                item: '1 minute ago'
+            }, {
+                idAddress: '0x123456789122121212121210',
+                btn: 'Lend',
+                num: '0.001 ETH',
+                item: '1 minute ago'
+            }, {
+                idAddress: '0x123456789122121212121210',
+                btn: 'Lend',
+                num: '0.001 ETH',
+                item: '1 minute ago'
+            }, {
+                idAddress: '0x123456789122121212121210',
+                btn: 'Lend',
+                num: '0.001 ETH',
+                item: '1 minute ago'
+            }, {
+                idAddress: '0x123456789122121212121210',
+                btn: 'Lend',
+                num: '0.001 ETH',
+                item: '1 minute ago'
+            }],
+            web3: null,
+            getEth: '-' // 更新每天收益的值
         }
     },
     watch: {
-        token () {
-            // this.getHistoryList()
+        // 我这里将钱包地址存为 token
+        token (newData) {
+            if (!newData) {
+                this.isSubmit = true
+            }
         }
     },
     mounted () {
         this.initSwiper()
         this.web3 = new Web3(window.ethereum)
+        this.HistoryList.forEach(item => {
+            item.idAddress = truncateString(item.idAddress)
+        })
     },
     methods: {
         handleChangeSilder () {
@@ -378,38 +391,8 @@ export default {
             this.isSubmit = false
         },
         AccountPage () {
-
+            this.$router.push('/AccountOverview')
         },
-        // 获取指定地址的交易历史
-        getTransactionHistory (address) {
-            try {
-                console.log(this.web3);
-                // 获取最近的交易列表
-                const transactions = this.web3.eth.getTransactionByAddress(address, function (error, txCount) {
-                    return console.log(error, txCount);
-                    // your code
-                })
-
-                return transactions;
-            } catch (error) {
-                console.error("获取交易历史失败:", error);
-                return null;
-            }
-        },
-        // 获取交易历史
-        async getHistoryList () {
-            try {
-                // 获取交易历史
-                const transactionHistory = await this.getTransactionHistory(this.token);
-                if (transactionHistory !== null) {
-                    console.log("交易历史:", transactionHistory);
-                } else {
-                    console.error("获取交易历史失败");
-                }
-            } catch (error) {
-                console.error("发生错误:", error);
-            }
-        }
     }
 }
 </script>
@@ -437,13 +420,15 @@ export default {
 .swiperBox
     overflow: hidden
     position: relative
-    width: 100%
+    width: 80%
+    margin-left: 10%
+    margin-right: 10%
 
 .swiper
     width: 120%
-    height: 750px
+    height: 500px
     position: static !important
-    padding-bottom: 60px !important
+    padding-bottom: 100px !important
 
     &-slide
         text-align: center
@@ -456,7 +441,7 @@ export default {
     &-slide img
         display: block
         width: 100%
-        height: 100%
+        // height: 100%
         object-fit: cover
 
     &-pagination-current

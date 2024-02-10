@@ -17,7 +17,7 @@
                     <h3>$10.0</h3>
                     <div class="text-btn">
                         <h3>NEXT HARVEST <span>Mar. 31, 2024</span></h3>
-                        <el-button type="text">HARVES</el-button>
+                        <el-button type="text">HARVEST</el-button>
                     </div>
                 </div>
             </div>
@@ -170,7 +170,8 @@
                     <div class="house centerBetween">
                         <div class="car"><img src="@/assets/images/banner2.png"></div>
                         <div class="tableHouse">
-                            <el-table height='320'
+                            <el-table ref="house"
+                                      height='320'
                                       :data="houseData"
                                       style="width: 100%">
                                 <el-table-column width="60px"
@@ -184,7 +185,7 @@
                                 </el-table-column>
                                 <el-table-column label="Vehicle Model">
                                     <template slot-scope="{ row }">
-                                        <span>${{ row.Model }}</span>
+                                        <span>{{ row.Model }}</span>
                                     </template>
                                 </el-table-column>
                                 <el-table-column label="Amount">
@@ -194,7 +195,9 @@
                                 </el-table-column>
                                 <el-table-column label="Status">
                                     <template slot-scope="{ row }">
-                                        <span>${{ row.Status }}</span>
+                                        <el-button type="text"
+                                                   style="color: #000;font-size: 16px;letter-spacing: 0.42px;font-family:'SourceHanSansCNRegular'"
+                                                   @click="openModal">{{ row.Status }}</el-button>
                                     </template>
                                 </el-table-column>
                             </el-table>
@@ -258,21 +261,25 @@
                 </div>
             </div>
         </div>
+        <ModalDialog ref="Modal"></ModalDialog>
     </div>
 </template>
 
 <script>
+import ModalDialog from './components/modal';
 import * as echarts from 'echarts';
 import { truncateString } from '@/utils/app';
 import COMINGSOON from './components/COMINGSOON'
 export default {
     name: 'AccountOverview',
     components: {
-        COMINGSOON
+        COMINGSOON,
+        ModalDialog
     },
     data () {
         return {
             selectValue: 'WEEK',
+            currentRow: null,
             historyData: [
                 {
                     EST: 'Mar.31, 2024',
@@ -328,42 +335,32 @@ export default {
             houseData: [{
                 ID: '0x12346465465464646789',
                 Model: 'Test Model 1',
-                Amount: '$4,350',
+                Amount: '4,350',
                 Status: 'OnGoing'
             }, {
                 ID: '0x12346465465464646789',
                 Model: 'Test Model 1',
-                Amount: '$4,350',
+                Amount: '4,350',
                 Status: 'OnGoing'
             }, {
                 ID: '0x12346465465464646789',
                 Model: 'Test Model 1',
-                Amount: '$4,350',
+                Amount: '4,350',
                 Status: 'OnGoing'
             }, {
                 ID: '0x12346465465464646789',
                 Model: 'Test Model 1',
-                Amount: '$4,350',
+                Amount: '4,350',
                 Status: 'OnGoing'
             }, {
                 ID: '0x12346465465464646789',
                 Model: 'Test Model 1',
-                Amount: '$4,350',
+                Amount: '4,350',
                 Status: 'OnGoing'
             }, {
                 ID: '0x12346465465464646789',
                 Model: 'Test Model 1',
-                Amount: '$4,350',
-                Status: 'OnGoing'
-            }, {
-                ID: '0x12346465465464646789',
-                Model: 'Test Model 1',
-                Amount: '$4,350',
-                Status: 'OnGoing'
-            }, {
-                ID: '0x12346465465464646789',
-                Model: 'Test Model 1',
-                Amount: '$4,350',
+                Amount: '4,350',
                 Status: 'OnGoing'
             }]
         }
@@ -518,12 +515,18 @@ export default {
                 ]
             };
             myChart.setOption(option);
+        },
+        openModal () {
+            this.$refs.Modal.openModal()
         }
     }
 }
 </script>
 
 <style lang="sass" scoped>
+::v-deep.el-table .success-row
+    background: #fff
+
 .marginBottom
     margin-bottom: 80px
 .paddingBottom

@@ -1,0 +1,12 @@
+.el-dialog {
+  border: 20px;
+}
+
+.el-dialog .el-dialog__header {
+  padding: 0;
+}
+
+.el-dialog .el-dialog__body {
+  padding: 0;
+  border-radius: 50px;
+}
