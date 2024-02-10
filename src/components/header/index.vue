@@ -13,11 +13,11 @@
                 <a><img src="@/assets/images/X.svg" /></a>
             </nav>
             <div class="info centerBetween">
-                <template v-if="token">
+                <template v-if="account">
                     <el-button type="text"
                                @click="$router.push('/AccountOverview')">Account Overview</el-button>
                     <el-button class="Connect"
-                               type="text">{{ newPersonID }}</el-button>
+                               type="text">{{ account }}</el-button>
                 </template>
                 <el-button v-else
                            @click="connectWallet"
@@ -32,7 +32,8 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
+import { getAccounts } from '@/utils/ethers'
 export default {
     // eslint-disable-next-line vue/multi-word-component-names
     name: 'Header',
@@ -45,7 +46,8 @@ export default {
         ...mapGetters([
             'newPersonID',
             'token'
-        ])
+        ]),
+        ...mapState('web3', ['account'])
     },
     mounted () {
         if (this.$route.path == '/AccountOverview') {
@@ -82,11 +84,12 @@ export default {
     },
     methods: {
         connectWallet () {
-            this.$store.dispatch('user/login')
-                .then(() => {
-                })
-                .catch(() => {
-                })
+            // this.$store.dispatch('user/login')
+            //     .then(() => {
+            //     })
+            //     .catch(() => {
+            //     })
+            getAccounts().catch();
         }
     }
 }
