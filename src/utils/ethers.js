@@ -12,6 +12,10 @@ export const getReadOnlyProvider = () => {
     return provider
 }
 
+
+/**
+ * 切换链，不同链的数据是隔离的，用户没有装插件的话是不能使用的，安装插件后，该方法会自动帮用户插件添加对应的链
+ */
 export const setupNetwork = async () => {
     const ethereum = window.ethereum;
     if (!ethereum) return;
