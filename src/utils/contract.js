@@ -78,8 +78,9 @@ export async function userStaked(address) {
         // staked表示用户执行过质押
         // staking表示用正在质押
         // staked=true, staking=false 表示用户质押后取消了质押
+        return userInfo
     } catch (e) {
-        
+        console.log('get stake info fail:', e)
     }
 }
 
@@ -104,7 +105,7 @@ export async function getPendingReward(address) {
 export async function getTransctions() {
     try {
         const contract = await getContract()
-        const lastIndex = await contract.index();
+        const lastIndex = parseInt(await contract.index());
         const startIndex = Math.max(1, lastIndex - 10)
         let m = []
         for (let i = lastIndex; i >= startIndex; i--) {
@@ -122,6 +123,6 @@ export async function getTransctions() {
         // ]
         return trans;
     } catch (e) {
-        
+        console.log('get transactions fail:', e)
     }
 }
