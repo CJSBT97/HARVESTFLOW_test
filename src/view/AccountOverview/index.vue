@@ -14,10 +14,11 @@
                                style="color: #000;">&lt; Account Overview</el-button>
                 </div>
                 <div class="text centerBetween">
-                    <h3>$10.0</h3>
+                    <h3>{{ethBalance}}ETH</h3>
                     <div class="text-btn">
                         <h3>NEXT HARVEST <span>Mar. 31, 2024</span></h3>
-                        <el-button type="text">HARVEST</el-button>
+                        <el-button @click="harvest"
+                                   type="text">HARVEST</el-button>
                     </div>
                 </div>
             </div>
@@ -266,6 +267,8 @@
 </template>
 
 <script>
+import { mapGetters, mapState } from 'vuex'
+import { unstake } from '@/utils/contract'
 import ModalDialog from './components/modal';
 import * as echarts from 'echarts';
 import { truncateString } from '@/utils/app';
@@ -275,6 +278,12 @@ export default {
     components: {
         COMINGSOON,
         ModalDialog
+    },
+    computed: {
+        ...mapGetters([
+            'accountFilter'
+        ]),
+        ...mapState('web3', ['ethBalance'])
     },
     data () {
         return {
@@ -518,6 +527,12 @@ export default {
         },
         openModal () {
             this.$refs.Modal.openModal()
+        },
+        // 取出
+        harvest () {
+            unstake().cath((res) => {
+                console.log(res)
+            })
         }
     }
 }

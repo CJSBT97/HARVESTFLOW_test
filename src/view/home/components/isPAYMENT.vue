@@ -6,15 +6,12 @@
 </template>
 
 <script>
+import { getAccounts } from '@/utils/ethers'
 export default {
     name: 'isPAYMENT',
     methods: {
         connectWallet () {
-            this.$store.dispatch('user/login')
-                .then(() => {
-                })
-                .catch(() => {
-                })
+            getAccounts().catch();
         }
     }
 }

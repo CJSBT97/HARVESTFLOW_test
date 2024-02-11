@@ -1,17 +1,18 @@
 import { abi } from './abis'
-import { ethers } from 'ethers' 
+import { ethers } from 'ethers'
 import { setupNetwork, waitForTx } from './ethers'
 import { CONTRACT_ADDRESS, STAKE_AMOUNT } from '@/config'
-import { expr } from 'jquery'
+// import { expr } from 'jquery'
 
-async function getContract() {
+async function getContract () {
     await setupNetwork()
     const provider = new ethers.BrowserProvider(window.ethereum)
     // construct contract
     const contract = new ethers.Contract(CONTRACT_ADDRESS, abi, provider)
+    return contract.connect(await provider.getSigner())
 }
 
-export async function stake() {
+export async function stake () {
     try {
         const contract = await getContract()
         const tx = await contract.stake({
@@ -19,29 +20,29 @@ export async function stake() {
         })
         await waitForTx(tx.hash)
         return;
-    } catch(e) {
+    } catch (e) {
         console.log('stake fail:', e)
     }
 }
 
-export async function unstake() {
+export async function unstake () {
     try {
         const contract = await getContract()
         const tx = await contract.unstake()
         await waitForTx(tx.hash)
         return;
-    } catch(e) {
+    } catch (e) {
         console.log('unstake fail:', e)
     }
 }
 
-export async function claim() {
+export async function claim () {
     try {
         const contract = await getContract()
         const tx = await contract.claim()
         await waitForTx(tx.hash)
         return;
-    } catch(e) {
+    } catch (e) {
         console.log('claim fail:', e)
     }
 }
@@ -50,7 +51,7 @@ export async function claim() {
  * 
  * @param {*} address Login user's eth address
  */
-export async function getPendingReward(address) {
+export async function getPendingReward (address) {
     try {
         const contract = await getContract()
         const pendingReward = await contract.pendingReward(address)
@@ -60,7 +61,7 @@ export async function getPendingReward(address) {
     }
 }
 
-export async function getTransctions() {
+export async function getTransctions () {
     try {
         const contract = await getContract()
         const lastIndex = await contract.index();
@@ -81,6 +82,6 @@ export async function getTransctions() {
         // ]
         return trans;
     } catch (e) {
-        
+        console.log(e)
     }
 }
