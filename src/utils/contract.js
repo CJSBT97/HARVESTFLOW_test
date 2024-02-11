@@ -9,6 +9,7 @@ async function getContract() {
     const provider = new ethers.BrowserProvider(window.ethereum)
     // construct contract
     const contract = new ethers.Contract(CONTRACT_ADDRESS, abi, provider)
+    return contract.connect(await provider.getSigner())
 }
 
 export async function stake() {
