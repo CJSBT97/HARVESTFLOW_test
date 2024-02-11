@@ -121,7 +121,7 @@ height: 132px;">
                 <div class="column"
                      style="margin-top: 48px;">——— PAYMENT</div>
                 <div class="PAYMENT">
-                    <isPAYMENT v-show="!token"></isPAYMENT>
+                    <isPAYMENT v-if="!accountFilter"></isPAYMENT>
                     <div class="clickChange">
                         <el-button-group>
                             <el-button @click="clickChange('LEND')"
@@ -148,7 +148,7 @@ height: 132px;">
                     <div class="total">
                         <h4 class="color999">Total Rewards</h4>
                         <!-- 这里需要获取一天内的收益 -->
-                        <h3>{{ getEth }}<span>ETH</span></h3>
+                        <h3>{{ ethBalance }}<span>ETH</span></h3>
                     </div>
                     <!-- todo 这里是sumbit -->
                     <template v-if="isSubmit">
@@ -247,10 +247,10 @@ height: 132px;">
                         <li v-for="(item, index) in HistoryList"
                             :key="index">
                             <i class="face"><img src="@/assets/images/face.png"></i>
-                            <p>{{ item.idAddress }} </p>
-                            <div class="btn">{{ item.btn }}</div> <!-- 这块 leng 和 HARVEST 展示有区别 -->
-                            <h4>{{ item.num }} ETH</h4>
-                            <p class="time">{{ item.item }}</p>
+                            <p>{{ item.address }} </p>
+                            <div :class="item.btn == 'Lend' ? 'btn' : 'HARVEST'">{{ item.btn }}</div> <!-- 这块 leng 和 HARVEST 展示有区别 -->
+                            <h4>{{ item.amount }} ETH</h4>
+                            <p class="time">{{ item.time }}</p>
                         </li>
                     </ul>
                 </div>
@@ -281,7 +281,9 @@ height: 132px;">
 import Swiper from 'swiper'
 import { truncateString } from '@/utils/app';
 import isPAYMENT from './components/isPAYMENT'
-import { mapGetters } from 'vuex'
+import { stake, getTransctions } from '@/utils/contract'
+import { parseTimestamp } from '@/utils/helper'
+import { mapGetters, mapState } from 'vuex'
 import Web3 from 'web3';
 
 export default {
@@ -291,9 +293,9 @@ export default {
     },
     computed: {
         ...mapGetters([
-            'newPersonID',
-            'token'
-        ])
+            'accountFilter'
+        ]),
+        ...mapState('web3', ['ethBalance'])
     },
     data () {
         return {
@@ -302,49 +304,44 @@ export default {
             currentName: 'LEND',
             isSubmit: true,
             HistoryList: [{
-                idAddress: '0x123456789122121212121210',
+                address: '0x123456789122121212121210',
                 btn: 'Lend',
-                num: '0.001 ETH',
-                item: '1 minute ago'
+                amount: '0.001',
+                time: '1 minute ago'
             }, {
-                idAddress: '0x123456789122121212121210',
-                btn: 'Lend',
-                num: '0.001 ETH',
-                item: '1 minute ago'
+                address: '0x123456789122121212121210',
+                btn: 'HARVEST',
+                amount: '0.001',
+                time: '1 minute ago'
             }, {
-                idAddress: '0x123456789122121212121210',
+                address: '0x123456789122121212121210',
                 btn: 'Lend',
-                num: '0.001 ETH',
-                item: '1 minute ago'
+                amount: '0.001',
+                time: '1 minute ago'
             }, {
-                idAddress: '0x123456789122121212121210',
+                address: '0x123456789122121212121210',
                 btn: 'Lend',
-                num: '0.001 ETH',
-                item: '1 minute ago'
+                amount: '0.001',
+                time: '1 minute ago'
             }, {
-                idAddress: '0x123456789122121212121210',
+                address: '0x123456789122121212121210',
                 btn: 'Lend',
-                num: '0.001 ETH',
-                item: '1 minute ago'
+                amount: '0.001',
+                time: '1 minute ago'
             }, {
-                idAddress: '0x123456789122121212121210',
+                address: '0x123456789122121212121210',
                 btn: 'Lend',
-                num: '0.001 ETH',
-                item: '1 minute ago'
-            }, {
-                idAddress: '0x123456789122121212121210',
-                btn: 'Lend',
-                num: '0.001 ETH',
-                item: '1 minute ago'
+                amount: '0.001',
+                time: '1 minute ago'
             }],
             web3: null,
             getEth: '-' // 更新每天收益的值
         }
     },
     watch: {
-        // 我这里将钱包地址存为 token
-        token (newData) {
+        accountFilter (newData) {
             if (!newData) {
+                this.getTransctions()
                 this.isSubmit = true
             }
         }
@@ -353,7 +350,7 @@ export default {
         this.initSwiper()
         this.web3 = new Web3(window.ethereum)
         this.HistoryList.forEach(item => {
-            item.idAddress = truncateString(item.idAddress)
+            item.address = truncateString(item.address)
         })
     },
     methods: {
@@ -389,10 +386,56 @@ export default {
         },
         SUBMIT () {
             this.isSubmit = false
+            stake().catch((err) => {
+                console.log(err)
+            })
+
         },
         AccountPage () {
             this.$router.push('/AccountOverview')
         },
+        // 获取历史信息
+        getTransctions () {
+            getTransctions().then((res) => {
+                const newArry = []
+                res.forEach((item) => {
+                    item.forEach((item, index) => {
+                        const obj = {}
+                        switch (index) {
+                            case 0:
+                                switch (item) {
+                                    case 1:
+                                        obj.btn = 'Lend'
+                                        break
+                                    case 2:
+                                        obj.btn = 'HARVEST'
+                                        break
+                                    case 3:
+                                        break
+                                    default:
+                                        break
+                                }
+                                break
+                            case 1:
+                                obj.address = truncateString(item)
+                                break
+                            case 2:
+                                obj.time = parseTimestamp(item)
+                                break
+                            case 3:
+                                obj.amount = item
+                                break
+                            default:
+                                break
+                        }
+                        newArry.push(obj)
+                    })
+                })
+                this.HistoryList = newArry
+            }).catch(() => {
+
+            })
+        }
     }
 }
 </script>
@@ -853,14 +896,19 @@ export default {
     letter-spacing: 0.3px
 
 .HistoryList .btn
-    display: flex
     width: 81px
+    text-align: center
+    color: #fff
     padding: 4px 12px
-    justify-content: center
-    align-items: center
-    gap: 10px
     border-radius: 100px
     background: var(--SUB_BLUE, #82a4bd)
+.HistoryList .HARVEST
+    width: 81px
+    text-align: center
+    color: #fff
+    padding: 4px 12px
+    border-radius: 100px
+    background: linear-gradient(0deg, rgba(50, 89, 180, 0.25) 0%, rgba(50, 89, 180, 0.25) 100%), linear-gradient(82deg, #30BAE6 -0.19%, #D6ACFF 99.05%)
 
 .HistoryList h4
     color: var(--TEXT_BLACK, #282828)

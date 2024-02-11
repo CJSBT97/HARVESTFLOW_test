@@ -13,11 +13,11 @@
                 <a><img src="@/assets/images/X.svg" /></a>
             </nav>
             <div class="info centerBetween">
-                <template v-if="account">
+                <template v-if="accountFilter">
                     <el-button type="text"
                                @click="$router.push('/AccountOverview')">Account Overview</el-button>
                     <el-button class="Connect"
-                               type="text">{{ account }}</el-button>
+                               type="text">{{ accountFilter }}</el-button>
                 </template>
                 <el-button v-else
                            @click="connectWallet"
@@ -45,7 +45,9 @@ export default {
     computed: {
         ...mapGetters([
             'newPersonID',
-            'token'
+            'token',
+            'account',
+            'accountFilter'
         ]),
         ...mapState('web3', ['account'])
     },
@@ -60,7 +62,8 @@ export default {
         window.ethereum.on('accountsChanged', (accounts) => {
             if (accounts.length === 0) {
                 console.log("用户已断开连接");
-                this.$store.dispatch('user/resetToken')
+                this.$store.commit('web3/saveAccountFilter', null)
+                this.$store.commit('web3/accountFilter', null)
             } else {
                 console.log("用户已连接，当前账户:", accounts[0]);
             }
@@ -68,8 +71,10 @@ export default {
         // 监听网络变化事件
         window.ethereum.on('chainChanged', (chainId) => {
             // 当用户切换网络时，会触发该事件 重新链接钱包
-            this.$store.dispatch('user/resetToken')
-            this.$store.dispatch('user/login')
+            // this.$store.dispatch('user/resetToken')
+            // this.$store.dispatch('user/login')
+            this.$store.commit('web3/saveAccountFilter', null)
+            this.$store.commit('web3/accountFilter', null)
             console.log("用户已切换网络，当前网络ID:", chainId);
         });
     },

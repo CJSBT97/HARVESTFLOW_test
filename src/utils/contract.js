@@ -1,7 +1,8 @@
 import { abi } from './abis'
-import { ethers } from 'ethers' 
+import { ethers } from 'ethers'
 import { setupNetwork, waitForTx } from './ethers'
 import { CONTRACT_ADDRESS, STAKE_AMOUNT } from '@/config'
+
 
 /**
  * 获取质押合约
@@ -15,11 +16,13 @@ async function getContract() {
     return contract.connect(await provider.getSigner())
 }
 
+
 /**
  * 质押ETH， 0.0001个，只有没有质押过的用户才可以质押，质押过的用户不能再次质押
  * @returns 
  */
 export async function stake() {
+
     try {
         const contract = await getContract()
         const tx = await contract.stake({
@@ -27,10 +30,11 @@ export async function stake() {
         })
         await waitForTx(tx.hash)
         return;
-    } catch(e) {
+    } catch (e) {
         console.log('stake fail:', e)
     }
 }
+
 
 /**
  * 取消质押，有质押的用户才能质押，取消质押会赎回用户的ETH和待领取的奖励
@@ -42,22 +46,25 @@ export async function unstake() {
         const tx = await contract.unstake()
         await waitForTx(tx.hash)
         return;
-    } catch(e) {
+    } catch (e) {
         console.log('unstake fail:', e)
     }
 }
+
 
 /**
  * 领取奖励，对于质押的用户，可以随时领取利息奖励，年化5%，按秒更新奖励
  * @returns 
  */
 export async function claim() {
+=======
+
     try {
         const contract = await getContract()
         const tx = await contract.claim()
         await waitForTx(tx.hash)
         return;
-    } catch(e) {
+    } catch (e) {
         console.log('claim fail:', e)
     }
 }
@@ -88,7 +95,7 @@ export async function userStaked(address) {
  * 获取质押用户待领取的奖励
  * @param {*} address Login user's eth address
  */
-export async function getPendingReward(address) {
+export async function getPendingReward (address) {
     try {
         const contract = await getContract()
         const pendingReward = await contract.pendingReward(address)
@@ -98,11 +105,13 @@ export async function getPendingReward(address) {
     }
 }
 
+
 /**
  * 获取所有的交易记录，这里只获取了最近的10笔奖励，更多的交易记录需要传之前的索引就行，交易索引是按时间从1开始自增的
  * @returns 
  */
 export async function getTransctions() {
+
     try {
         const contract = await getContract()
         const lastIndex = parseInt(await contract.index());
@@ -123,6 +132,7 @@ export async function getTransctions() {
         // ]
         return trans;
     } catch (e) {
+
         console.log('get transactions fail:', e)
     }
 }
