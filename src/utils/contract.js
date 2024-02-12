@@ -7,9 +7,15 @@ const ethers = require('ethers');
 
 /**
  * 获取质押合约
- * @returns 
+ * @returns
  */
 async function getContract () {
+
+/**
+ * 获取质押合约
+ * @returns
+ */
+async function getContract() {
     await setupNetwork()
     const provider = new ethers.BrowserProvider(window.ethereum)
     // construct contract
@@ -20,9 +26,10 @@ async function getContract () {
 
 /**
  * 质押ETH， 0.0001个，只有没有质押过的用户才可以质押，质押过的用户不能再次质押
- * @returns 
+ * @returns
  */
-export async function stake () {
+export async function stake() {
+
     try {
         const contract = await getContract()
         const tx = await contract.stake({
@@ -38,7 +45,7 @@ export async function stake () {
 
 /**
  * 取消质押，有质押的用户才能质押，取消质押会赎回用户的ETH和待领取的奖励
- * @returns 
+ * @returns
  */
 export async function unstake () {
     try {
@@ -54,7 +61,7 @@ export async function unstake () {
 
 /**
  * 领取奖励，对于质押的用户，可以随时领取利息奖励，年化5%，按秒更新奖励
- * @returns 
+ * @returns
  */
 export async function claim () {
     try {
@@ -69,9 +76,9 @@ export async function claim () {
 
 /**
  * 用户质押信息，用来判断用户的质押状态
- * @param {*} address 
+ * @param {*} address
  */
-export async function userStaked (address) {
+export async function userStaked(address) {
     try {
         const contract = await getContract()
         const userInfo = await contract.stakeInfo(address)
@@ -107,7 +114,7 @@ export async function getPendingReward (address) {
 
 /**
  * 获取所有的交易记录，这里只获取了最近的10笔奖励，更多的交易记录需要传之前的索引就行，交易索引是按时间从1开始自增的
- * @returns 
+ * @returns
  */
 export async function getTransctions () {
 
@@ -120,7 +127,6 @@ export async function getTransctions () {
             m.push(contract.transactions(i))
         }
         const trans = await Promise.all(m)
-        console.log('trans', trans)
         // [
         //     [
         //         2n,  // transaction type: 1: stake, 2: unstake , 3: claim
