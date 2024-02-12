@@ -2,19 +2,21 @@
     <div>
         <div v-show="isTrue"
              class="follow center">
-            <p>Stay tuned for more exciting projects coming your way in April 2024!</p>
+            <p>HARVEST FLOW is currently on testnet. Stay tuned for more exciting projects coming your way in Spring 2024!</p>
             <a href="#"> Follow X > </a>
         </div>
-        <header class="centerBetween marginBox">
+        <header class="centerBetween marginBoxHeaderFooter">
             <nav class="centerBetween">
                 <div class="logo"><img src="@/assets/images/logo.svg" /></div>
                 <a>Explore</a>
                 <a>FAQ</a>
-                <a><img src="@/assets/images/X.svg" /></a>
+                <a href="https://x.com/HarvestFlow_io"
+                   target="_blank"><img src="@/assets/images/X.svg" /></a>
             </nav>
             <div class="info centerBetween">
                 <template v-if="accountFilter">
                     <el-button type="text"
+                               style="color: #325AB4;font-family: 'PlusJakartaSansBlod';font-size:16px;font-weight:500;"
                                @click="$router.push('/AccountOverview')">Account Overview</el-button>
                     <el-button class="Connect"
                                type="text">{{ accountFilter }}</el-button>
@@ -57,7 +59,7 @@ export default {
         } else {
             this.isTrue = true
         }
-        this.$store.dispatch('user/getInfo')
+        // this.$store.dispatch('user/getInfo')
         // 监听账户变化事件
         window.ethereum.on('accountsChanged', (accounts) => {
             if (accounts.length === 0) {
@@ -75,6 +77,7 @@ export default {
             // this.$store.dispatch('user/login')
             this.$store.commit('web3/saveAccountFilter', null)
             this.$store.commit('web3/accountFilter', null)
+            getAccounts().catch();
             console.log("用户已切换网络，当前网络ID:", chainId);
         });
     },
@@ -89,11 +92,6 @@ export default {
     },
     methods: {
         connectWallet () {
-            // this.$store.dispatch('user/login')
-            //     .then(() => {
-            //     })
-            //     .catch(() => {
-            //     })
             getAccounts().catch();
         }
     }
@@ -120,13 +118,25 @@ header
     font-weight: 800
 
 .follow
-    background: rgba(217, 217, 217, 1)
+    background: rgba(237, 243, 247, 1)
     width: 100%
     height: 51px
+    color: var(--TEXT_BLACK, #282828)
+    font-family: "Noto Sans"
+    font-size: 13px
+    font-weight: 400
+    line-height: 180%
+    letter-spacing: 0.39px
 
     & a
         margin-left: 10%
-        color: rgba(50, 89, 180, 1)
+        color: var(--MAIN_BLUE, #325AB4)
+        font-family: "Noto Sans"
+        font-size: 13px
+        font-style: normal
+        font-weight: 400
+        line-height: 180%
+        letter-spacing: 0.39px
 .isConnect,.Connect
     width: 148px
     height: 37px
