@@ -6,5 +6,5 @@ export const CHAIN_NAME = 'blast-test'
 export const BLOCK_CHAIN_BROWER = ''
 export const MainToken = 'ETH'
 
-export const CONTRACT_ADDRESS = '0xC0664e3F8c9aFCf4763CFad4e790178f36742aC9'
+export const CONTRACT_ADDRESS = '0x4d4679Bd8EA26070340eaE9b5c5564D6Dc5d2AD5'
 export const STAKE_AMOUNT = '0.001'

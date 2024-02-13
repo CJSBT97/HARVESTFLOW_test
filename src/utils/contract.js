@@ -126,3 +126,28 @@ export async function getTransctions() {
         console.log('get transactions fail:', e)
     }
 }
+
+/**
+ * 获取用户持有的sbt的id，如果为0，则不持有sbt
+ * @param {*} address 
+ * @returns 
+ */
+export async function userSBTID (address) {
+    try {
+        const contract = await getContract()
+        const sbtId = await contract.sbtHolder(address)
+        return sbtId;
+    } catch (e) {
+        console.log('get user sbt id fail:', e)
+    }
+}
+
+export async function SBTUrl(sbtId) {
+    try {
+        const contract = await getContract()
+        const url = await contract.tokenURI(sbtId)
+        return url;
+    } catch (e) {
+        console.log('get user sbt url fail:', e)
+    }
+}
