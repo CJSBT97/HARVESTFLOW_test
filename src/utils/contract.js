@@ -1,12 +1,19 @@
 import { abi } from './abis'
-import { ethers } from 'ethers'
+// import { ethers } from 'ethers'
 import { setupNetwork, waitForTx } from './ethers'
 import { CONTRACT_ADDRESS, STAKE_AMOUNT } from '@/config'
+const ethers = require('ethers');
 
 
 /**
  * 获取质押合约
- * @returns 
+ * @returns
+ */
+async function getContract () {
+
+/**
+ * 获取质押合约
+ * @returns
  */
 async function getContract() {
     await setupNetwork()
@@ -19,7 +26,7 @@ async function getContract() {
 
 /**
  * 质押ETH， 0.0001个，只有没有质押过的用户才可以质押，质押过的用户不能再次质押
- * @returns 
+ * @returns
  */
 export async function stake() {
 
@@ -38,9 +45,9 @@ export async function stake() {
 
 /**
  * 取消质押，有质押的用户才能质押，取消质押会赎回用户的ETH和待领取的奖励
- * @returns 
+ * @returns
  */
-export async function unstake() {
+export async function unstake () {
     try {
         const contract = await getContract()
         const tx = await contract.unstake()
@@ -54,11 +61,9 @@ export async function unstake() {
 
 /**
  * 领取奖励，对于质押的用户，可以随时领取利息奖励，年化5%，按秒更新奖励
- * @returns 
+ * @returns
  */
-export async function claim() {
-=======
-
+export async function claim () {
     try {
         const contract = await getContract()
         const tx = await contract.claim()
@@ -71,7 +76,7 @@ export async function claim() {
 
 /**
  * 用户质押信息，用来判断用户的质押状态
- * @param {*} address 
+ * @param {*} address
  */
 export async function userStaked(address) {
     try {
@@ -99,7 +104,8 @@ export async function getPendingReward (address) {
     try {
         const contract = await getContract()
         const pendingReward = await contract.pendingReward(address)
-        return pendingReward;
+        const rewardInEther = ethers.formatEther(pendingReward);
+        return String(rewardInEther);
     } catch (e) {
         console.log('get pending reward fail:', e)
     }
@@ -108,9 +114,9 @@ export async function getPendingReward (address) {
 
 /**
  * 获取所有的交易记录，这里只获取了最近的10笔奖励，更多的交易记录需要传之前的索引就行，交易索引是按时间从1开始自增的
- * @returns 
+ * @returns
  */
-export async function getTransctions() {
+export async function getTransctions () {
 
     try {
         const contract = await getContract()
@@ -132,10 +138,10 @@ export async function getTransctions() {
         // ]
         return trans;
     } catch (e) {
-
         console.log('get transactions fail:', e)
     }
 }
+
 
 /**
  * 获取用户持有的sbt的id，如果为0，则不持有sbt

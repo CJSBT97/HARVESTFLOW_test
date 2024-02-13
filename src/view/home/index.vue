@@ -7,8 +7,9 @@
                 <h3>to Support Drivers in</h3>
                 <h3>South East Asia</h3>
             </div>
+            <p class="text">Tentative: All images and contents will be updated later.</p>
         </div>
-        <div class="swiperBox">
+        <div class="swiperBox marginUp">
             <div class="swiper">
                 <div class="swiper-wrapper">
                     <div class="swiper-slide"><img src="@/assets/images/silde.png"></div>
@@ -32,7 +33,7 @@
 
         <div class="content marginUp marginBox">
             <div class="contentLeft">
-                <div class="column">——— About The Project</div>
+                <div class="column">About The Project</div>
                 <h3>A Leap Towards <br> Financial Inclusion</h3>
                 <h4>Challenges Harvest Flow Solves</h4>
                 <p>
@@ -80,7 +81,7 @@ height: 132px;">
                 <img src="@/assets/images/image99.png">
             </div>
             <div class="contentRight">
-                <div class="column">——— OVERVIEW</div>
+                <div class="column">OVERVIEW</div>
                 <div class="rightText">
                     <p>PROGRESS</p>
                     <h3>-%</h3>
@@ -119,7 +120,7 @@ height: 132px;">
                     <h3>28th Feb. 2025</h3>
                 </div>
                 <div class="column"
-                     style="margin-top: 48px;">——— PAYMENT</div>
+                     style="margin-top: 48px;">PAYMENT</div>
                 <div class="PAYMENT">
                     <isPAYMENT v-if="!accountFilter"></isPAYMENT>
                     <div class="clickChange">
@@ -148,10 +149,10 @@ height: 132px;">
                     <div class="total">
                         <h4 class="color999">Total Rewards</h4>
                         <!-- 这里需要获取一天内的收益 -->
-                        <h3>{{ ethBalance }}<span>ETH</span></h3>
+                        <h3>{{ getEth }}<span>ETH</span></h3>
                     </div>
                     <!-- todo 这里是sumbit -->
-                    <template v-if="isSubmit">
+                    <template v-if="isSubmit && !staked">
                         <p class="color999"
                            style="margin: 9px 0;">
                             This product is currently in a testnet version, so the data and program behavior may not be accurate.
@@ -175,7 +176,7 @@ height: 132px;">
         <div class="Overview">
             <h3 class="OverviewColor000">Overview</h3>
             <div class="overViewBox REPAYMENTTERMS">
-                <div class="column">——— REPAYMENT TERMS</div>
+                <div class="column">REPAYMENT TERMS</div>
                 <ul>
                     <li>
                         <p>LOAN TERM</p>
@@ -211,7 +212,7 @@ height: 132px;">
             </div>
             <div class="towBox">
                 <div class="overViewBox">
-                    <div class="column">——— RETURN SIMULATOR</div>
+                    <div class="column">RETURN SIMULATOR</div>
                     <h3 class="OverviewColor000"
                         style="font-family: 'PlusJakartaSansBlod';">You can create a simulation of
                         return you will be getting by entering
@@ -241,22 +242,57 @@ height: 132px;">
                 </div>
                 <div class="overViewBox">
                     <div class="title">
-                        <div class="column">——— Transaction History</div>
+                        <div class="column">Transaction History</div>
                     </div>
-                    <ul class="HistoryList">
-                        <li v-for="(item, index) in HistoryList"
+                    <el-table v-show="historyListData.length > 0 "
+                              ref="house"
+                              class="HistoryList"
+                              height='460'
+                              :data="historyListData"
+                              style="width: 100%">
+                        <el-table-column show-overflow-tooltip
+                                         width="60px">
+                            <template>
+                                <i class="face"><img style="width: 40px; height: 40px"
+                                         src="@/assets/images/face.png"></i>
+                            </template>
+                        </el-table-column>
+                        <el-table-column show-overflow-tooltip>
+                            <template slot-scope="{ row }">
+                                {{ row.userAddress }}
+                            </template>
+                        </el-table-column>
+                        <el-table-column show-overflow-tooltip>
+                            <template slot-scope="{row}">
+                                <div :class="row.btn == 'Lend' ? 'btn' : 'HARVEST'">{{ row.btn }}</div> <!-- 这块 leng 和 HARVEST 展示有区别 -->
+                            </template>
+                        </el-table-column>
+                        <el-table-column show-overflow-tooltip
+                                         width="220px">
+                            <template slot-scope="{row}">
+                                <h4>{{ row.amount }} ETH</h4>
+                            </template>
+                        </el-table-column>
+                        <el-table-column show-overflow-tooltip>
+                            <template slot-scope="{row}">
+                                <p class="time">{{ row.timestamp }}</p>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                    <!-- <ul class="HistoryList">
+                        <li v-for="(item, index) in historyListData"
                             :key="index">
                             <i class="face"><img src="@/assets/images/face.png"></i>
-                            <p>{{ item.address }} </p>
-                            <div :class="item.btn == 'Lend' ? 'btn' : 'HARVEST'">{{ item.btn }}</div> <!-- 这块 leng 和 HARVEST 展示有区别 -->
+                            <p>{{ item.userAddress }} </p>
+                            <div :class="item.btn == 'Lend' ? 'btn' : 'HARVEST'">{{ item.btn }}</div> 
                             <h4>{{ item.amount }} ETH</h4>
-                            <p class="time">{{ item.time }}</p>
+                            <p class="time">{{ item.timestamp }}</p>
                         </li>
-                    </ul>
+                    </ul> -->
                 </div>
             </div>
             <div class="overViewBox">
-                <div class="column">——— Project OWNER</div>
+                <div class="column">Project OWNER</div>
                 <div class="owwer">
                     <div class="icon"><img src="@/assets/images/image69.png"></div>
                     <div class="text">
@@ -267,13 +303,18 @@ height: 132px;">
                             record of selling out many NFT projects and have extensive web3 content production experience
                             and network.</p>
                         <div class="link">
-                            <a href="#"><img src="@/assets/images/solar_link-bold.png">apasport.xyz</a>
-                            <a href="#"><img src="@/assets/images/X.svg" /><span>apasport</span></a>
+                            <a href="https://apasport.xyz/"
+                               target="_blank"><img src="@/assets/images/solar_link-bold.png"
+                                     style="padding-right: 13px;">apasport.xyz</a>
+                            <a href="https://x.com/ApasPort_Web3"
+                               target="_blank"><img src="@/assets/images/X.svg"
+                                     style="padding-right: 13px;" /><span>apasport</span></a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <CongratulationsDialog ref="CongratulationsDialog"></CongratulationsDialog>
     </div>
 </template>
 
@@ -281,21 +322,23 @@ height: 132px;">
 import Swiper from 'swiper'
 import { truncateString } from '@/utils/app';
 import isPAYMENT from './components/isPAYMENT'
-import { stake, getTransctions } from '@/utils/contract'
+import { stake, getTransctions, getPendingReward, userStaked } from '@/utils/contract'
 import { parseTimestamp } from '@/utils/helper'
 import { mapGetters, mapState } from 'vuex'
 import Web3 from 'web3';
+import CongratulationsDialog from './components/Congratulations'
 
 export default {
     name: 'PageDetail',
     components: {
-        isPAYMENT
+        isPAYMENT,
+        CongratulationsDialog
     },
     computed: {
         ...mapGetters([
             'accountFilter'
         ]),
-        ...mapState('web3', ['ethBalance'])
+        ...mapState('web3', ['account'])
     },
     data () {
         return {
@@ -303,55 +346,43 @@ export default {
             silderNum: 0,
             currentName: 'LEND',
             isSubmit: true,
-            HistoryList: [{
-                address: '0x123456789122121212121210',
-                btn: 'Lend',
-                amount: '0.001',
-                time: '1 minute ago'
-            }, {
-                address: '0x123456789122121212121210',
-                btn: 'HARVEST',
-                amount: '0.001',
-                time: '1 minute ago'
-            }, {
-                address: '0x123456789122121212121210',
-                btn: 'Lend',
-                amount: '0.001',
-                time: '1 minute ago'
-            }, {
-                address: '0x123456789122121212121210',
-                btn: 'Lend',
-                amount: '0.001',
-                time: '1 minute ago'
-            }, {
-                address: '0x123456789122121212121210',
-                btn: 'Lend',
-                amount: '0.001',
-                time: '1 minute ago'
-            }, {
-                address: '0x123456789122121212121210',
-                btn: 'Lend',
-                amount: '0.001',
-                time: '1 minute ago'
-            }],
+            historyListData: [],
             web3: null,
-            getEth: '-' // 更新每天收益的值
+            getEth: '-',  // 更新每天收益的值
+            staked: false, // 表示用户执行过质押
+            staking: false, // 表示用户质押后取消了质押
+            timer: null
         }
     },
     watch: {
         accountFilter (newData) {
-            if (!newData) {
-                this.getTransctions()
+            if (newData) {
+                this.getHistoryList()
                 this.isSubmit = true
+                userStaked(this.account).then(res => {
+                    console.log(res)
+                    this.staked = res[0]
+                })
+                this.getPendingReward()
             }
         }
     },
     mounted () {
         this.initSwiper()
+        if (this.accountFilter) {
+            this.getHistoryList()
+            this.isSubmit = true
+            userStaked(this.account).then(res => {
+                console.log(res)
+                this.staked = res[0]
+            })
+            this.getPendingReward()
+        }
         this.web3 = new Web3(window.ethereum)
-        this.HistoryList.forEach(item => {
-            item.address = truncateString(item.address)
-        })
+    },
+    destroyed () {
+        clearInterval(this.timer)
+        this.timer = null
     },
     methods: {
         handleChangeSilder () {
@@ -386,52 +417,64 @@ export default {
         },
         SUBMIT () {
             this.isSubmit = false
-            stake().catch((err) => {
-                console.log(err)
+            if (this.staked) {
+                this.getPendingReward()
+            } else {
+                stake().catch((err) => {
+                    console.log(err)
+                })
+                this.showCongratulationsDialog()
+            }
+        },
+        showCongratulationsDialog () {
+            this.timer = setInterval(() => {
+                userStaked(this.account).then(res => {
+                    if (res[1]) {
+                        this.$refs.CongratulationsDialog.showDialog()
+                        clearInterval(this.timer)
+                    }
+                })
+            }, 3600)
+        },
+        getPendingReward () {
+            getPendingReward(this.account).then((res) => {
+                this.getEth = Number(res).toFixed(15)
             })
-
         },
         AccountPage () {
             this.$router.push('/AccountOverview')
         },
         // 获取历史信息
-        getTransctions () {
-            getTransctions().then((res) => {
+        getHistoryList () {
+            getTransctions().then((resPromise) => {
+                const ethers = require('ethers');
                 const newArry = []
-                res.forEach((item) => {
-                    item.forEach((item, index) => {
-                        const obj = {}
-                        switch (index) {
-                            case 0:
-                                switch (item) {
-                                    case 1:
-                                        obj.btn = 'Lend'
-                                        break
-                                    case 2:
-                                        obj.btn = 'HARVEST'
-                                        break
-                                    case 3:
-                                        break
-                                    default:
-                                        break
-                                }
-                                break
-                            case 1:
-                                obj.address = truncateString(item)
-                                break
-                            case 2:
-                                obj.time = parseTimestamp(item)
-                                break
-                            case 3:
-                                obj.amount = item
-                                break
-                            default:
-                                break
-                        }
-                        newArry.push(obj)
-                    })
-                })
-                this.HistoryList = newArry
+                resPromise.forEach(transaction => {
+                    let data = {}
+                    switch (Number(transaction[0])) {
+                        case 1:
+                            data.btn = 'Lend'
+                            break
+                        case 2:
+                            break
+                        case 3:
+                            data.btn = 'HARVEST'
+                            break
+                        default:
+                            break
+                    }
+                    data.transactionType = Number(transaction[0]); // 交易类型
+                    data.userAddress = truncateString(transaction[1]); // 用户地址
+                    data.timestamp = parseTimestamp(Number(transaction[2]) * 1000); // 时间戳
+                    if ((ethers.formatEther(transaction[3])).length > 15) {
+                        data.amount = Number(ethers.formatEther(transaction[3])).toFixed(15); // 金额
+                    } else {
+                        data.amount = Number(ethers.formatEther(transaction[3])) // 金额
+                    }
+
+                    newArry.push(data)
+                });
+                this.historyListData = JSON.parse(JSON.stringify(newArry))
             }).catch(() => {
 
             })
@@ -440,6 +483,31 @@ export default {
 }
 </script>
 <style lang="sass" scoped>
+:deep .el-table::before
+    background: transparent
+:deep.el-table td.el-table__cell, :deep.el-table th.el-table__cell.is-leaf
+    border: none
+:deep.el-table .el-table__cell
+    padding: 16px 0
+:deep .el-table__header-wrapper
+    display: none
+:deep  .el-table__body-wrapper::-webkit-scrollbar
+    width: 8px // 横向滚动条
+    height: 8px // 纵向滚动条必写
+// 2、定义滚动条轨道 内阴影+圆角
+:deep  .el-table__body-wrapper::-webkit-scrollbar-track
+    box-shadow: 0px 1px 3px #E1EBF2 inset
+    border-radius: 6px
+    background-color: #E1EBF2
+
+// 3、定义滑块 内阴影+圆角
+:deep .el-table__body-wrapper::-webkit-scrollbar-thumb
+    box-shadow: 0px 1px 3px #00a0e9 inset
+    border-radius: 10px
+    background-color: #325AB4
+// 4、表头的后面小空白
+:deep .el-table__cell.gutter
+    background-color: transparent //表头的后面小空白颜色修改
 .banner
     position: relative
     text-align: center
@@ -450,15 +518,29 @@ export default {
         top: 50%
         left: 50%
         transform: translate(-50%, -50%)
-        font-weight: bold
+        color: #FFF
+        text-align: center
+        font-family: "Plus Jakarta Sans"
         font-size: 96px
-        color: rgba(50, 89, 180, 1)
-        font-family: "PlusJakartaSansBlod"
-        line-height: 160px
-        letter-spacing: 0em
+        font-style: normal
+        font-weight: 800
+        line-height: 130%
+        letter-spacing: -0.96px
+
+    & .text
+        position: absolute
+        bottom: 3%
+        left: 50%
+        transform: translate(-50%, -3%)
+        color: #FFF
+        font-family: "Noto Sans"
+        font-size: 13px
+        line-height: 180%
+        letter-spacing: 0.39px
+        opacity: 0.5
 
     & img
-        width: 60%
+        width: 100%
 
 .swiperBox
     overflow: hidden
@@ -508,6 +590,11 @@ export default {
 
 .swiper-button-next
     right: 38% !important
+::v-depp.swiper-pagination > .swiper-pagination-total
+    padding-left: 70px!important
+
+::v-depp.swiper-pagination > .swiper-pagination-current
+    padding-right: 70px!important
 
 .content
     display: flex
@@ -520,6 +607,8 @@ export default {
         width: 25%
 
 .column
+    position: relative
+    padding-left: 40px
     color: var(--TEXT_BLACK, #282828)
     font-family: "PlusJakartaSansRegular"
     font-size: 12px
@@ -529,6 +618,16 @@ export default {
     letter-spacing: 0.6px
     text-transform: uppercase
     padding-bottom: 40px
+.column:after
+    content: ''
+    display: block
+    position: absolute
+    top: 14%
+    left: 0
+    width: 20px
+    height: 1px
+    flex-shrink: 0
+    background: #282828
 
 .contentLeft h3
     padding: 19px 0 20px 0
@@ -544,7 +643,7 @@ export default {
 .contentLeft h4
     color: var(--MAIN_BLUE, #3259b4)
     /* heading_small */
-    font-family: "SourceHanSansCNRegular"
+    font-family: "Noto Sans"
     font-size: 20px
     font-style: normal
     font-weight: 700
@@ -556,7 +655,7 @@ export default {
     margin-top: 16px
     color: var(--TEXT_BLACK, #282828)
     /* text */
-    font-family: "SourceHanSansCNRegular"
+    font-family: "Noto Sans"
     font-size: 16px
     font-style: normal
     font-weight: 400
@@ -572,7 +671,7 @@ export default {
 .REPAYMENTTERMS ul li p
     color: var(--TEXT_GREY, #999)
     /* text_small */
-    font-family: "SourceHanSansCNRegular"
+    font-family: "Noto Sans"
     font-size: 13px
     font-style: normal
     font-weight: 400
@@ -584,7 +683,7 @@ export default {
 .REPAYMENTTERMS ul li h3
     color: var(--TEXT_BLACK, #282828)
     /* heading_small */
-    font-family: "SourceHanSansCNRegular"
+    font-family: "Noto Sans"
     font-size: 20px
     font-style: normal
     font-weight: 700
@@ -618,7 +717,7 @@ export default {
 .Investment
     color: #282828
     text-align: right
-    font-family: "SourceHanSansCNRegular"
+    font-family: "Noto Sans"
     font-size: 13px
     font-style: normal
     font-weight: 400
@@ -651,7 +750,7 @@ export default {
 
     & span
         color: #161520
-        font-family: "SourceHanSansCNRegular"
+        font-family: "Noto Sans"
         font-size: 13px
         font-style: normal
         font-weight: 400
@@ -673,7 +772,7 @@ export default {
 .color999
     color: #999
     /* text_small */
-    font-family: "SourceHanSansCNRegular"
+    font-family: "Noto Sans"
     font-size: 13px
     font-style: normal
     font-weight: 400
@@ -684,7 +783,7 @@ export default {
 .color2828
     color: var(--TEXT_BLACK, #282828)
     /* text_small */
-    font-family: "SourceHanSansCNRegular"
+    font-family: "Noto Sans"
     font-size: 13px
     font-style: normal
     font-weight: 400
@@ -698,7 +797,7 @@ export default {
     & a
         color: #3259b4
         /* text_small */
-        font-family: "SourceHanSansCNRegular"
+        font-family: "Noto Sans"
         font-size: 13px
         font-style: normal
         font-weight: 400
@@ -715,7 +814,7 @@ export default {
         color: var(--MAIN_BLUE, #3259b4)
         /* heading_en-only */
         font-family: "PlusJakartaSansRegular"
-        font-size: 40px
+        font-size: 25px
         font-weight: 800
         line-height: 130%
         /* 52px */
@@ -725,7 +824,7 @@ export default {
         padding-left: 10px
         color: var(--MAIN_BLUE, #3259b4)
         /* text_small */
-        font-family: "SourceHanSansCNRegular"
+        font-family: "Noto Sans"
         font-size: 13px
         font-weight: 400
         line-height: 180%
@@ -835,7 +934,7 @@ export default {
     & .text h4
         color: #000
         /* heading_small */
-        font-family: "SourceHanSansCNRegular"
+        font-family: "Noto Sans"
         font-size: 20px
         font-style: normal
         font-weight: 700
@@ -849,7 +948,7 @@ export default {
         color: var(--Text-2, #22252d)
         text-overflow: ellipsis
         /* text */
-        font-family: "SourceHanSansCNRegular"
+        font-family: "Noto Sans"
         font-size: 16px
         font-style: normal
         font-weight: 400
@@ -876,7 +975,7 @@ export default {
 
 .HistoryList p
     color: var(--TEXT_BLACK, #282828)
-    font-family: "SourceHanSansCNRegular"
+    font-family: "Noto Sans"
     font-size: 13px
     font-style: normal
     font-weight: 400
@@ -912,7 +1011,7 @@ export default {
 
 .HistoryList h4
     color: var(--TEXT_BLACK, #282828)
-    font-family: "SourceHanSansCNRegular"
+    font-family: "Noto Sans"
     font-size: 16px
     font-style: normal
     font-weight: 400
@@ -936,7 +1035,7 @@ export default {
         padding-left: 40px
         color: var(--TEXT_BLACK, #282828)
         /* text_small */
-        font-family: "SourceHanSansCNRegular"
+        font-family: "Noto Sans"
         font-size: 13px
         font-style: normal
         font-weight: 400
@@ -1004,4 +1103,11 @@ export default {
         letter-spacing: 0.39px
 .PAYMENT
     position: relative
+:deep .el-slider__button
+    width: 23px
+    height: 23px
+    border: 2px solid #325AB4
+    background-color: #325AB4
+:deep .el-slider__bar
+    background-color: transparent
 </style>

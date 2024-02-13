@@ -12,12 +12,12 @@
     width: 100%
     height: 100%
     color: #fff
-    z-index: 3
     & > h3
         position: absolute
         top: 50%
         left: 50%
         transform: translate(-50%, -50%)
+        z-index: 3
         width: 440px
         height: 90px
         line-height: 90px

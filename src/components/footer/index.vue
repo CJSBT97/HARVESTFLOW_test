@@ -1,11 +1,12 @@
 <template>
     <div>
-        <footer class="centerBetween">
+        <footer class="centerBetween marginBoxHeaderFooter">
             <nav class="centerBetween">
                 <div class="logo"><img src="@/assets/images/logo.svg" /></div>
-                <a>Explore</a>
-                <a>FAQ</a>
-                <a><img src="@/assets/images/X.svg" /></a>
+                <a>Privacy Policy</a>
+                <a>LAW</a>
+                <a href="https://x.com/HarvestFlow_io"
+                   target="_blank"><img src="@/assets/images/X.svg" /></a>
             </nav>
             <p>©️2024 Apas Port Inc. All rights reserved.</p>
         </footer>

@@ -6,7 +6,7 @@
 html {
     height: 100%;
     width: 100%;
-    font-family: 'SourceHanSansCNRegular';
+    font-family: 'Noto Sans';
     /* 1rem = 80 */
 }
 
@@ -39,6 +39,11 @@ img {
     src: url('../assets/font/PlusJakartaSans-Bold.ttf') format('truetype');
 }
 
+@font-face {
+    font-family: 'Noto Sans';
+    src: url('../assets/font/NotoSans-Regular.ttf') format('truetype');
+}
+
 
 header nav >* , footer nav >*{
     margin-right: 40px;
@@ -48,6 +53,12 @@ header nav >* , footer nav >*{
 .marginBox {
     padding-left: 10%;
     padding-right: 10%;
+    box-sizing: border-box;
+}
+
+.marginBoxHeaderFooter {
+    padding-left: 5%;
+    padding-right: 5%;
     box-sizing: border-box;
 }
 

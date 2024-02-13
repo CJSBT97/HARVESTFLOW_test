@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/no-parsing-error -->
 <template>
     <div>
         <div class="banner marginBox">
@@ -11,13 +10,14 @@
                 <div class="link">
                     <el-button type="text"
                                @click="$router.push('/home')"
-                               style="color: #000;">&lt; Account Overview</el-button>
+                               style="color: #000;">&lt; HOME</el-button>
                 </div>
                 <div class="text centerBetween">
-                    <h3>{{ethBalance}}ETH</h3>
+                    <h3>{{getEth}}ETH</h3>
                     <div class="text-btn">
                         <h3>NEXT HARVEST <span>Mar. 31, 2024</span></h3>
                         <el-button @click="harvest"
+                                   :class="getEth == 0 ? 'isZero' : ''"
                                    type="text">HARVEST</el-button>
                     </div>
                 </div>
@@ -28,7 +28,7 @@
                              alt=""></div>
                     <div class="articletext">
                         <h3>Vehicle Leasing Project to Support Drivers in South East Asia</h3>
-                        <el-button type="text">ARTICLE ></el-button>
+                        <el-button type="text">Project Detail ></el-button>
                     </div>
                 </div>
             </el-card>
@@ -70,7 +70,7 @@
             </div>
 
             <div class="REPAYMENTTERMS marginBottom">
-                <div class="column">——— REPAYMENT TERMS</div>
+                <div class="column">REPAYMENT TERMS</div>
                 <ul>
                     <li>
                         <p>LOAN TERM</p>
@@ -125,18 +125,22 @@
                                   :data="historyData"
                                   style="width: 100%">
                             <el-table-column width="50px"
+                                             show-overflow-tooltip
                                              type="index"
                                              label="#">
                             </el-table-column>
                             <el-table-column prop="EST"
+                                             show-overflow-tooltip
                                              label="EST.payment date">
                             </el-table-column>
-                            <el-table-column label="Principal due">
+                            <el-table-column label="Principal due"
+                                             show-overflow-tooltip>
                                 <template slot-scope="{ row }">
                                     <span>${{ row.Principal }}</span>
                                 </template>
                             </el-table-column>
-                            <el-table-column label="Interest due">
+                            <el-table-column label="Interest due"
+                                             show-overflow-tooltip>
                                 <template slot-scope="{ row }">
                                     <span>${{ row.Interest }}</span>
                                 </template>
@@ -174,31 +178,39 @@
                             <el-table ref="house"
                                       height='320'
                                       :data="houseData"
-                                      style="width: 100%">
+                                      style="width: 100%"
+                                      @row-click="openModal"
+                                      :row-class-name="tableRowClassName">
                                 <el-table-column width="60px"
                                                  type="index"
+                                                 show-overflow-tooltip
                                                  label="Asset">
                                 </el-table-column>
-                                <el-table-column label="dNFT ID">
+                                <el-table-column label="dNFT ID"
+                                                 show-overflow-tooltip>
                                     <template slot-scope="{row}">
                                         {{ row.newID }}
                                     </template>
                                 </el-table-column>
-                                <el-table-column label="Vehicle Model">
+                                <el-table-column label="Vehicle Model"
+                                                 show-overflow-tooltip>
                                     <template slot-scope="{ row }">
                                         <span>{{ row.Model }}</span>
                                     </template>
                                 </el-table-column>
-                                <el-table-column label="Amount">
+                                <el-table-column label="Amount"
+                                                 show-overflow-tooltip>
                                     <template slot-scope="{ row }">
                                         <span>${{ row.Amount }}</span>
                                     </template>
                                 </el-table-column>
-                                <el-table-column label="Status">
+                                <el-table-column label="Status"
+                                                 show-overflow-tooltip>
                                     <template slot-scope="{ row }">
-                                        <el-button type="text"
-                                                   style="color: #000;font-size: 16px;letter-spacing: 0.42px;font-family:'SourceHanSansCNRegular'"
-                                                   @click="openModal">{{ row.Status }}</el-button>
+                                        {{ row.Status }}
+                                        <!-- <el-button type="text"
+                                                   style="color: #000;font-size: 16px;letter-spacing: 0.42px;font-family:'Noto Sans'"
+                                                   @click="openModal"></el-button> -->
                                     </template>
                                 </el-table-column>
                             </el-table>
@@ -218,7 +230,7 @@
                     </div>
                     <el-card>
                         <div class="mynftCard">
-                            <div class="mynftCard-img"><img src="@/assets/images/nftcar.png"></div>
+                            <div class="mynftCard-img"></div>
                             <div class="mynftCard-text">
                                 <div>
                                     <p class="color999">LENDING AMOUNT</p>
@@ -268,10 +280,11 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
-import { unstake } from '@/utils/contract'
+import { claim } from '@/utils/contract'
 import ModalDialog from './components/modal';
 import * as echarts from 'echarts';
-import { truncateString } from '@/utils/app';
+import { getPendingReward, userStaked } from '@/utils/contract'
+import { truncateString, daysSince } from '@/utils/app';
 import COMINGSOON from './components/COMINGSOON'
 export default {
     name: 'AccountOverview',
@@ -283,7 +296,7 @@ export default {
         ...mapGetters([
             'accountFilter'
         ]),
-        ...mapState('web3', ['ethBalance'])
+        ...mapState('web3', ['account'])
     },
     data () {
         return {
@@ -371,7 +384,18 @@ export default {
                 Model: 'Test Model 1',
                 Amount: '4,350',
                 Status: 'OnGoing'
-            }]
+            }],
+            getEth: 0,
+            timer: null,
+            timeDate: null
+        }
+    },
+    watch: {
+        accountFilter (newData) {
+            if (newData) {
+                this.userStaked()
+                // this.getPendingReward()
+            }
         }
     },
     mounted () {
@@ -380,6 +404,14 @@ export default {
         this.houseData.forEach(item => {
             item.newID = truncateString(item.ID)
         })
+        if (this.accountFilter) {
+            // this.getPendingReward()
+            this.userStaked()
+        }
+    },
+    destroyed () {
+        clearInterval(this.timer)
+        this.timer = null
     },
     methods: {
         initEchartPortfolio () {
@@ -415,7 +447,7 @@ export default {
                         textStyle: {
                             color: ' #000',
                             fontSize: '13',
-                            fontFamily: "SourceHanSansCNRegular"
+                            fontFamily: "Noto Sans"
 
                         }
                     },
@@ -530,17 +562,51 @@ export default {
         },
         // 取出
         harvest () {
-            unstake().cath((res) => {
+            if (this.getEth == 0) return
+            this.getPendingReward()
+            claim().cath((res) => {
                 console.log(res)
             })
+        },
+        getPendingReward () {
+            getPendingReward(this.account).then((res) => {
+                if (res) {
+                    this.getEth = String(res)
+                    this.timer = setInterval(() => {
+                        this.getEth = String(res)
+                    }, 36000);
+                }
+            })
+        },
+        userStaked () {
+            userStaked(this.account).then(res => {
+                if (res[0]) {
+                    this.timeDate = daysSince(Number(res[2]) * 1000)
+                    this.getEth = (0.001 * 0.05 / 365 * daysSince(Number(res[2]) * 1000)).toFixed(15)
+                    this.timer = setInterval(() => {
+                        if (this.timeDate < daysSince(Number(res[2]) * 1000)) {
+                            this.getEth = (this.getEth * daysSince(Number(res[2]) * 1000)).toFixed(15)
+                        }
+                    }, 3600000);
+                }
+            })
+        },
+        tableRowClassName ({ rowIndex }) {
+            if (rowIndex % 2) {
+                return '';
+            } else {
+                return 'blue-row';
+            }
         }
     }
 }
 </script>
 
 <style lang="sass" scoped>
-::v-deep.el-table .success-row
-    background: #fff
+::v-deep.el-table .blue-row
+    background-color: #EDF3F7!important
+// ::v-deep.el-table .success-row
+//     background: #fff
 
 .marginBottom
     margin-bottom: 80px
@@ -549,7 +615,7 @@ export default {
 .color999
     color: var(--TEXT_GREY, #999)
     /* text_small */
-    font-family: "SourceHanSansCNRegular"
+    font-family: "Noto Sans"
     font-size: 13px
     font-style: normal
     font-weight: 400
@@ -581,6 +647,8 @@ export default {
     padding: 30px 0
 
 .column
+    position: relative
+    padding-left: 30px
     color: var(--TEXT_BLACK, #282828)
     font-family: "PlusJakartaSansRegular"
     font-size: 12px
@@ -590,6 +658,16 @@ export default {
     letter-spacing: 0.6px
     text-transform: uppercase
     padding-bottom: 12px
+.column:after
+    content: ''
+    display: block
+    position: absolute
+    top: 27%
+    left: 0
+    width: 20px
+    height: 1px
+    flex-shrink: 0
+    background: #282828
 .REPAYMENTTERMS
     padding: 30px
     box-sizing: border-box
@@ -620,7 +698,7 @@ export default {
 .REPAYMENTTERMS ul li p
     color: var(--TEXT_GREY, #999)
     /* text_small */
-    font-family: "SourceHanSansCNRegular"
+    font-family: "Noto Sans"
     font-size: 13px
     font-style: normal
     font-weight: 400
@@ -631,7 +709,7 @@ export default {
 .REPAYMENTTERMS ul li h3
     color: var(--TEXT_BLACK, #282828)
     /* heading_small */
-    font-family: "SourceHanSansCNRegular"
+    font-family: "Noto Sans"
     font-size: 20px
     font-style: normal
     font-weight: 700
@@ -665,7 +743,7 @@ export default {
         & ::v-deep .el-input__inner
             background-color: transparent
             border: none
-            font-family: SourceHanSansCNRegular
+            font-family: Noto Sans
             color: var(--TEXT_BLACK, #282828)
             font-size: 16px
             font-style: normal
@@ -694,7 +772,7 @@ export default {
         margin-left: 30px
         color: #999
         /* text */
-        font-family: "SourceHanSansCNRegular"
+        font-family: "Noto Sans"
         font-size: 16px
         font-style: normal
         font-weight: 400
@@ -751,6 +829,8 @@ export default {
         background: var(--HAPPY_GRADIENT, linear-gradient(0deg, rgba(50, 89, 180, 0.25) 0%, rgba(50, 89, 180, 0.25) 100%), linear-gradient(82deg, #30BAE6 -0.19%, #D6ACFF 99.05%))
         &:hover
             background: linear-gradient(82.38deg, #30BAE6 -0.19%, #D6ACFF 99.05%),linear-gradient(0deg, rgba(50, 89, 180, 0.25), rgba(50, 89, 180, 0.25))
+    & .isZero
+        background: linear-gradient(82deg, rgba(139, 139, 139, 0.50) -0.19%, rgba(214, 214, 214, 0.50) 99.05%)
 
 .article
     position: relative
@@ -777,7 +857,7 @@ export default {
             bottom: 10px
             color: #282828
             font-size: 16px
-            font-family: SourceHanSansCNRegular
+            font-family: Noto Sans
             font-style: normal
             font-weight: 400
             line-height: 180%
@@ -873,6 +953,12 @@ export default {
                     display: inline-block
                 & span
                     font-size: 12px
+    & .mynftCard-img
+        height: 280px
+        border-radius: 15px 15px 0 0
+        background-image: url(~@/assets/images/nftcar.png)
+        background-size: 100%
+        background-position: center
 .Portfolio
     .dataText
         position: absolute
