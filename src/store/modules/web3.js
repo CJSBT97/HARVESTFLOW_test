@@ -11,9 +11,17 @@ export default {
         blockNum: null,
         nonce: null,
         readonlyProvider: null,
-        ethBalance: 0
+        ethBalance: 0,
+        userSBTID: null,
+        SBTUrl: null
     },
     mutations: {
+        saveuserSBTID: (state, userSBTID) => {
+            state.userSBTID = userSBTID;
+        },
+        saveSBTUrl: (state, SBTUrl) => {
+            state.SBTUrl = SBTUrl;
+        },
         saveEthers: (state, ethers) => {
             state.ethers = ethers;
         },

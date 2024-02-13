@@ -161,7 +161,16 @@ export default {
                         name: 'Hours',
                         type: 'bar',
                         itemStyle: {
-                            color: '#2E84F7',
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                {
+                                    offset: 0,
+                                    color: '#325AB4 '
+                                },
+                                {
+                                    offset: 1,
+                                    color: '#1C1C64 '
+                                }
+                            ]),
                             barBorderRadius: [8, 8, 0, 0]
                         },
                         data: Hours

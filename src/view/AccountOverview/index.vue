@@ -225,12 +225,14 @@
                     <div class="title">
                         <div class="title-text">
                             <h3>MY NFT</h3>
-                            <p>#1</p>
+                            <p>#{{ userSBTID }}</p>
                         </div>
                     </div>
                     <el-card>
                         <div class="mynftCard">
-                            <div class="mynftCard-img"></div>
+                            <div class="mynftCard-img">
+                                <img :src="SBTUrl">
+                            </div>
                             <div class="mynftCard-text">
                                 <div>
                                     <p class="color999">LENDING AMOUNT</p>
@@ -283,7 +285,7 @@ import { mapGetters, mapState } from 'vuex'
 import { claim } from '@/utils/contract'
 import ModalDialog from './components/modal';
 import * as echarts from 'echarts';
-import { getPendingReward, userStaked } from '@/utils/contract'
+import { getPendingReward, userStaked, userSBTID, SBTUrl } from '@/utils/contract'
 import { truncateString, daysSince } from '@/utils/app';
 import COMINGSOON from './components/COMINGSOON'
 export default {
@@ -296,7 +298,7 @@ export default {
         ...mapGetters([
             'accountFilter'
         ]),
-        ...mapState('web3', ['account'])
+        ...mapState('web3', ['account', 'userSBTID', 'SBTUrl'])
     },
     data () {
         return {
@@ -394,6 +396,14 @@ export default {
         accountFilter (newData) {
             if (newData) {
                 this.userStaked()
+                userSBTID(this.account).then(res => {
+                    if (Number(res) != 0) {
+                        this.$store.commit('web3/saveuserSBTID', Number(res))
+                        SBTUrl(res).then(e => {
+                            this.$store.commit('web3/saveSBTUrl', e)
+                        })
+                    }
+                })
                 // this.getPendingReward()
             }
         }
@@ -416,16 +426,13 @@ export default {
     methods: {
         initEchartPortfolio () {
             const myChart = echarts.init(this.$refs.Portfolio);
-            const color = new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                offset: 0,
-                color: '#325AB4'   // 渐变色起始颜色
-            }, {
-                offset: 0.5,
-                color: '#325AB4'   // 渐变色起始颜色
-            }, {
-                offset: 1,
-                color: '#1C1C64'   // 渐变色结束颜色
-            }]);
+            // const color = new echarts.graphic.LinearGradient(0, 0, 1, 0, [{
+            //     offset: 0,
+            //     color: '#1C1C64'   // 渐变色起始颜色
+            // }, {
+            //     offset: 1,
+            //     color: '#1C1C64'   // 渐变色结束颜色
+            // }]);
             const option = {
                 grid: { // 设置网格区域
                     width: '92%', // 设置宽度为80%
@@ -468,7 +475,16 @@ export default {
                         data: [520, 520, 520, 920, 920, 920, 920, 920, 1520, 1520],
                         type: 'line',
                         areaStyle: {
-                            color: color, // 设置面积图的颜色为渐变色
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                {
+                                    offset: 0,
+                                    color: '#325AB4 '
+                                },
+                                {
+                                    offset: 1,
+                                    color: '#1C1C64 '
+                                }
+                            ]),
                             borderRadius: [15, 15, 15, 15]
                         },
                         step: true,
@@ -534,9 +550,19 @@ export default {
                         data: PrincipalData,
                         xAxisIndex: 0,
                         itemStyle: {
-                            color: '#1C1C64',
+                            color: new echarts.graphic.LinearGradient(0, 1, 0, 0, [
+                                {
+                                    offset: 0,
+                                    color: '#1C1C64'
+                                },
+                                {
+                                    offset: 1,
+                                    color: '#325AB4'
+                                }
+                            ]),
                             barBorderRadius: [8, 8, 0, 0]
                         },
+                        zlevel: 9
                     },
                     {
                         name: 'Interest',
@@ -545,10 +571,10 @@ export default {
                         data: InterestData,
                         xAxisIndex: 1,
                         itemStyle: {
-                            color: 'rgba(207,227,252,0.7)',
+                            color: '#82A5BE',
                             barBorderRadius: [8, 8, 0, 0]
                         },
-                        zlevel: 9
+
                     },
                     { name: '', type: 'bar', show: false, barWidth: '20%', data: [0, 0, 0, 0], xAxisIndex: 0 },
                     { name: '', type: 'bar', show: false, barWidth: '20%', data: [0, 0, 0, 0], xAxisIndex: 1 },
@@ -956,9 +982,7 @@ export default {
     & .mynftCard-img
         height: 280px
         border-radius: 15px 15px 0 0
-        background-image: url(~@/assets/images/nftcar.png)
-        background-size: 100%
-        background-position: center
+        overflow: hidden
 .Portfolio
     .dataText
         position: absolute

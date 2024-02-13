@@ -5,8 +5,6 @@
                 <div class="logo"><img src="@/assets/images/logo.svg" /></div>
                 <a>Privacy Policy</a>
                 <a>LAW</a>
-                <a href="https://x.com/HarvestFlow_io"
-                   target="_blank"><img src="@/assets/images/X.svg" /></a>
             </nav>
             <p>©️2024 Apas Port Inc. All rights reserved.</p>
         </footer>
@@ -21,4 +19,13 @@ export default {
 </script>
 
 <style lang="sass" scoped>
+footer a
+    color: #000
+
+    font-family: "PlusJakartaSansRegular"
+    font-size: 16px
+    font-style: normal
+    font-weight: 500
+    line-height: normal
+    letter-spacing: 0.8px
 </style>

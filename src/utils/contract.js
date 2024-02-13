@@ -10,12 +10,6 @@ const ethers = require('ethers');
  * @returns
  */
 async function getContract () {
-
-/**
- * 获取质押合约
- * @returns
- */
-async function getContract() {
     await setupNetwork()
     const provider = new ethers.BrowserProvider(window.ethereum)
     // construct contract
@@ -28,8 +22,7 @@ async function getContract() {
  * 质押ETH， 0.0001个，只有没有质押过的用户才可以质押，质押过的用户不能再次质押
  * @returns
  */
-export async function stake() {
-
+export async function stake () {
     try {
         const contract = await getContract()
         const tx = await contract.stake({
@@ -78,7 +71,7 @@ export async function claim () {
  * 用户质押信息，用来判断用户的质押状态
  * @param {*} address
  */
-export async function userStaked(address) {
+export async function userStaked (address) {
     try {
         const contract = await getContract()
         const userInfo = await contract.stakeInfo(address)

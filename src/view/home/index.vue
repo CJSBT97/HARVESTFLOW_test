@@ -241,8 +241,13 @@ height: 132px;">
                     </ul>
                 </div>
                 <div class="overViewBox">
-                    <div class="title">
+                    <div class="title"
+                         style="display: flex;
+    align-items: flex-start;
+    justify-content: space-between;">
                         <div class="column">Transaction History</div>
+                        <el-button style="padding: 0"
+                                   type="text"><img src="@/assets/images/historyIcon.svg"></el-button>
                     </div>
                     <el-table v-show="historyListData.length > 0 "
                               ref="house"
@@ -284,7 +289,7 @@ height: 132px;">
                             :key="index">
                             <i class="face"><img src="@/assets/images/face.png"></i>
                             <p>{{ item.userAddress }} </p>
-                            <div :class="item.btn == 'Lend' ? 'btn' : 'HARVEST'">{{ item.btn }}</div> 
+                            <div :class="item.btn == 'Lend' ? 'btn' : 'HARVEST'">{{ item.btn }}</div>
                             <h4>{{ item.amount }} ETH</h4>
                             <p class="time">{{ item.timestamp }}</p>
                         </li>
@@ -322,10 +327,9 @@ height: 132px;">
 import Swiper from 'swiper'
 import { truncateString } from '@/utils/app';
 import isPAYMENT from './components/isPAYMENT'
-import { stake, getTransctions, getPendingReward, userStaked } from '@/utils/contract'
+import { stake, getTransctions, getPendingReward, userStaked, userSBTID, SBTUrl } from '@/utils/contract'
 import { parseTimestamp } from '@/utils/helper'
 import { mapGetters, mapState } from 'vuex'
-import Web3 from 'web3';
 import CongratulationsDialog from './components/Congratulations'
 
 export default {
@@ -338,7 +342,7 @@ export default {
         ...mapGetters([
             'accountFilter'
         ]),
-        ...mapState('web3', ['account'])
+        ...mapState('web3', ['account', 'userSBTID', 'SBTUrl'])
     },
     data () {
         return {
@@ -347,7 +351,6 @@ export default {
             currentName: 'LEND',
             isSubmit: true,
             historyListData: [],
-            web3: null,
             getEth: '-',  // 更新每天收益的值
             staked: false, // 表示用户执行过质押
             staking: false, // 表示用户质押后取消了质押
@@ -360,10 +363,10 @@ export default {
                 this.getHistoryList()
                 this.isSubmit = true
                 userStaked(this.account).then(res => {
-                    console.log(res)
                     this.staked = res[0]
                 })
                 this.getPendingReward()
+                this.getUserSBTID()
             }
         }
     },
@@ -373,12 +376,10 @@ export default {
             this.getHistoryList()
             this.isSubmit = true
             userStaked(this.account).then(res => {
-                console.log(res)
                 this.staked = res[0]
             })
             this.getPendingReward()
         }
-        this.web3 = new Web3(window.ethereum)
     },
     destroyed () {
         clearInterval(this.timer)
@@ -432,17 +433,29 @@ export default {
                     if (res[1]) {
                         this.$refs.CongratulationsDialog.showDialog()
                         clearInterval(this.timer)
+                        this.timer = null
                     }
                 })
             }, 3600)
         },
         getPendingReward () {
             getPendingReward(this.account).then((res) => {
-                this.getEth = Number(res).toFixed(15)
+                if (Number(res) > 0) {
+                    this.getEth = Number(res).toFixed(15)
+                }
             })
         },
         AccountPage () {
             this.$router.push('/AccountOverview')
+            // this.timer = setInterval(() => {
+            //     userStaked(this.account).then(res => {
+            //         if (res[1]) {
+            //             this.$refs.CongratulationsDialog.showDialog()
+            //             clearInterval(this.timer)
+            //             this.timer = null
+            //         }
+            //     })
+            // }, 3600)
         },
         // 获取历史信息
         getHistoryList () {
@@ -477,6 +490,16 @@ export default {
                 this.historyListData = JSON.parse(JSON.stringify(newArry))
             }).catch(() => {
 
+            })
+        },
+        getUserSBTID () {
+            userSBTID(this.account).then(res => {
+                if (Number(res) != 0) {
+                    this.$store.commit('web3/saveuserSBTID', Number(res))
+                    SBTUrl(res).then(e => {
+                        this.$store.commit('web3/saveSBTUrl', e)
+                    })
+                }
             })
         }
     }
@@ -595,6 +618,8 @@ export default {
 
 ::v-depp.swiper-pagination > .swiper-pagination-current
     padding-right: 70px!important
+.swiperBox .swiper-pagination-current
+    font-size: 20px !important
 
 .content
     display: flex
@@ -965,14 +990,6 @@ export default {
     & .text .link img
         width: 19px
         height: 17px
-
-.HistoryList li
-    margin-top: 16px
-    padding: 11px 0
-    display: flex
-    justify-content: space-between
-    align-items: center
-
 .HistoryList p
     color: var(--TEXT_BLACK, #282828)
     font-family: "Noto Sans"
@@ -1019,6 +1036,9 @@ export default {
     /* 28.8px */
     letter-spacing: 0.48px
     flex-basis: 40%
+
+.HistoryList ::v-deep.el-table tr
+    background-color: rgba(217,217,217,0.1 )
 
 .AMOUNT-H3
     color: var(--MAIN_BLUE, #3259b4)

@@ -7,10 +7,12 @@
                 <div class="title">
                     <h3>Congratulations!</h3>
                     <p>Your NFT has successfully been minted!!</p>
-                    <span>Transaction:0x123...789</span>
+                    <span>Transaction:{{ Transaction }}</span>
                 </div>
                 <div class="mynftCard">
-                    <div class="mynftCard-img"></div>
+                    <div class="mynftCard-img">
+                        <img :src="SBTUrl">
+                    </div>
                     <div class="mynftCard-text">
                         <div>
                             <p class="color999">LENDING AMOUNT</p>
@@ -44,16 +46,32 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+import { truncateString } from '@/utils/app';
+import { userSBTID, SBTUrl } from '@/utils/contract'
 export default {
     name: 'CongratulationsDialog',
     data () {
         return {
-            dialogVisible: false
+            dialogVisible: false,
+            Transaction: null
         }
+    },
+    computed: {
+        ...mapState('web3', ['account', 'userSBTID', 'SBTUrl'])
     },
     methods: {
         showDialog () {
             this.dialogVisible = true
+            userSBTID(this.account).then(res => {
+                if (Number(res) != 0) {
+                    this.$store.commit('web3/saveuserSBTID', Number(res))
+                    SBTUrl(res).then(e => {
+                        this.$store.commit('web3/saveSBTUrl', e)
+                        this.Transaction = truncateString('0x4d4679Bd8EA26070340eaE9b5c5564D6Dc5d2AD5')
+                    })
+                }
+            })
         },
         AccountPage () {
             this.$router.push('/AccountOverview')
@@ -153,11 +171,9 @@ export default {
                 & span
                     font-size: 12px
     & .mynftCard-img
+        overflow: hidden
         height: 280px
         border-radius: 15px 15px 0 0
-        background-image: url(~@/assets/images/nftcar.png)
-        background-size: 100%
-        background-position: center
 </style>
 
 <style lang="sass">
