@@ -2,7 +2,7 @@
     <div>
         <el-dialog :visible.sync="dialogVisible"
                    :show-close=false
-                   width="22%">
+                   width="30%">
             <div class="mynft">
                 <div class="title">
                     <h3>Congratulations!</h3>

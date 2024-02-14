@@ -3,6 +3,7 @@ import store from '@/store'
 import { RPC_NODE, CHAIN_ID, CHAIN_NAME, BLOCK_CHAIN_BROWER, MainToken } from '@/config'
 import { sleep } from '@/utils/helper'
 import { truncateString } from '@/utils/app'
+import { setToken, setTime } from '@/utils/auth'
 
 export const getReadOnlyProvider = () => {
     // if (store.state.ethers && Object.keys(store.state.ethers).length > 0) {
@@ -73,6 +74,8 @@ export const getAccounts = async () => {
     const accounts = await ethereum.request({ method: 'eth_requestAccounts' })
     let account = accounts[0]
     account = ethers.getAddress(account)
+    setToken(account)
+    setTime(new Date().getTime())
     store.commit('web3/saveAccount', account)
     store.commit('web3/saveAccountFilter', truncateString(account))
     return account

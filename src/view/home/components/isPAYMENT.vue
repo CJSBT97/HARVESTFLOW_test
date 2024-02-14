@@ -6,12 +6,37 @@
 </template>
 
 <script>
-import { getAccounts } from '@/utils/ethers'
+import { removeToken } from '@/utils/auth'
+import { getAccounts, setupNetwork } from '@/utils/ethers'
 export default {
     name: 'isPAYMENT',
+    data () {
+        return {
+            timer: null
+        }
+    },
+    beforeDestroy () {
+        clearTimeout(this.timer)
+        this.timer = null
+    },
     methods: {
-        connectWallet () {
-            getAccounts().catch();
+        async connectWallet () {
+            const res = await setupNetwork()
+
+            if (res) {
+                getAccounts().catch();
+                if (this.timer != null) {
+                    clearTimeout(this.timer)
+                    this.timer = null
+                }
+                this.timer = setTimeout(() => {
+                    removeToken()
+                    this.$store.commit('web3/saveAccount', null)
+                    this.$store.commit('web3/saveAccountFilter', null)
+                    clearTimeout(this.timer)
+                    this.timer = null
+                }, 60 * 60 * 1000);
+            }
         }
     }
 }
@@ -37,8 +62,9 @@ export default {
         text-align: center
         color: #fff
         font-size: 16px
-        font-family: PlusJakartaSansBlod
+        font-family: PlusJakartaSansRegular
         font-weight: 700
         border-radius: 100px
         background: #325AB4
+        letter-spacing: 1.6px
 </style>

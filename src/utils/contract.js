@@ -32,6 +32,7 @@ export async function stake () {
         return;
     } catch (e) {
         console.log('stake fail:', e)
+        return e
     }
 }
 
@@ -151,7 +152,7 @@ export async function userSBTID (address) {
     }
 }
 
-export async function SBTUrl(sbtId) {
+export async function SBTUrl (sbtId) {
     try {
         const contract = await getContract()
         const url = await contract.tokenURI(sbtId)

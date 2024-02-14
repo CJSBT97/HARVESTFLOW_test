@@ -16,8 +16,10 @@
                     <h3>{{getEth}}ETH</h3>
                     <div class="text-btn">
                         <h3>NEXT HARVEST <span>Mar. 31, 2024</span></h3>
+                        <!-- :class="getEth == 0 ? 'isZero' : ''" -->
                         <el-button @click="harvest"
-                                   :class="getEth == 0 ? 'isZero' : ''"
+                                   disabled
+                                   class="isZero"
                                    type="text">HARVEST</el-button>
                     </div>
                 </div>
@@ -28,7 +30,8 @@
                              alt=""></div>
                     <div class="articletext">
                         <h3>Vehicle Leasing Project to Support Drivers in South East Asia</h3>
-                        <el-button type="text">Project Detail ></el-button>
+                        <el-button type="text"
+                                   @click="$router.push('/home')">Project Detail ></el-button>
                     </div>
                 </div>
             </el-card>
@@ -231,7 +234,7 @@
                     <el-card>
                         <div class="mynftCard">
                             <div class="mynftCard-img">
-                                <img :src="SBTUrl">
+                                <img src="@/assets/images/nftcar.gif">
                             </div>
                             <div class="mynftCard-text">
                                 <div>
@@ -253,7 +256,7 @@
                                     </li>
                                     <li>
                                         <p class="color999">RARITY</p>
-                                        <div><img src="@/assets/images/blrst.svg"><span>Testnet</span></div>
+                                        <div style="display: flex;"><img src="@/assets/images/blrst.svg"><span>Testnet(SBT)</span></div>
                                     </li>
                                 </ul>
                             </div>
@@ -270,7 +273,8 @@
                         <div class="centerBetween updateItem">
                             <span class="time">2024.2.12</span>
                             <h3>We are joining Blast Big Bang Competition!!</h3>
-                            <el-button type="text"> <img src="@/assets/images/updateIcon.svg"> </el-button>
+                            <a href="https://twitter.com/HarvestFlow_io/status/1757405327320903705"
+                               target="_blank"><img src="@/assets/images/updateIcon.svg"></a>
                         </div>
                     </el-card>
                 </div>
@@ -389,6 +393,7 @@ export default {
             }],
             getEth: 0,
             timer: null,
+            timer2: null,
             timeDate: null
         }
     },
@@ -422,18 +427,14 @@ export default {
     destroyed () {
         clearInterval(this.timer)
         this.timer = null
+        clearInterval(this.timer2)
+        this.timer2 = null
     },
     methods: {
         initEchartPortfolio () {
             const myChart = echarts.init(this.$refs.Portfolio);
-            // const color = new echarts.graphic.LinearGradient(0, 0, 1, 0, [{
-            //     offset: 0,
-            //     color: '#1C1C64'   // 渐变色起始颜色
-            // }, {
-            //     offset: 1,
-            //     color: '#1C1C64'   // 渐变色结束颜色
-            // }]);
             const option = {
+                backgroundColor: 'transparent',
                 grid: { // 设置网格区域
                     width: '92%', // 设置宽度为80%
                     height: '92%', // 设置高度为60%
@@ -485,7 +486,8 @@ export default {
                                     color: '#1C1C64 '
                                 }
                             ]),
-                            borderRadius: [15, 15, 15, 15]
+                            borderRadius: [15, 15, 15, 15],
+                            opacity: 1
                         },
                         step: true,
                     }
@@ -598,7 +600,7 @@ export default {
             getPendingReward(this.account).then((res) => {
                 if (res) {
                     this.getEth = String(res)
-                    this.timer = setInterval(() => {
+                    this.timer2 = setInterval(() => {
                         this.getEth = String(res)
                     }, 36000);
                 }
@@ -945,9 +947,9 @@ export default {
     & .tableHouse
         width: 70%
 .mynft
-    width: 23%
+    width: 30%
 .update
-    width: 75%
+    width: 68%
     & .updateItem
         padding: 30px
         & .time
@@ -963,7 +965,7 @@ export default {
             text-overflow: ellipsis
 .mynftCard
     & .mynftCard-text
-        padding: 30px
+        padding: 10px
         box-sizing: border-box
         & > div h3
             color: #282828
@@ -974,6 +976,8 @@ export default {
             display: flex
             & > li
                 width: 30%
+                display: flex
+                flex-direction: column
                 & img
                     width: 51%
                     display: inline-block
@@ -983,6 +987,10 @@ export default {
         height: 280px
         border-radius: 15px 15px 0 0
         overflow: hidden
+        img
+            height: 100%
+            object-fit: cover
+
 .Portfolio
     .dataText
         position: absolute

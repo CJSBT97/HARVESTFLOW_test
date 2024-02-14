@@ -3,14 +3,16 @@
         <div class="banner">
             <img src="@/assets/images/banner.png">
             <div class="bannerText">
-                <h3>Vehicle Leasing Project</h3>
-                <h3>to Support Drivers in</h3>
-                <h3>South East Asia</h3>
+                <h3>Vehicle Leasing Project<br>
+                    to Support Drivers in<br>
+                    South East Asia
+                </h3>
             </div>
             <p class="text">Tentative: All images and contents will be updated later.</p>
         </div>
         <div class="swiperBox marginUp">
-            <div class="swiper">
+            <div class="swiper"
+                 id="parent">
                 <div class="swiper-wrapper">
                     <div class="swiper-slide"><img src="@/assets/images/silde.png"></div>
                     <div class="swiper-slide"><img src="@/assets/images/silde2.png"></div>
@@ -122,13 +124,15 @@ height: 132px;">
                 <div class="column"
                      style="margin-top: 48px;">PAYMENT</div>
                 <div class="PAYMENT">
-                    <isPAYMENT v-if="!accountFilter"></isPAYMENT>
+                    <isPAYMENT v-show="!accountFilter"></isPAYMENT>
                     <div class="clickChange">
                         <el-button-group>
+                            <!-- :class="currentName == 'LEND' ? 'clickCurrent' : ''" -->
                             <el-button @click="clickChange('LEND')"
-                                       :class="currentName == 'LEND' ? 'clickCurrent' : ''"
+                                       class="clickCurrent"
                                        type="text">LEND</el-button>
-                            <el-button @click="clickChange('WITHDRAW')"
+                            <el-button disabled
+                                       @click="clickChange('WITHDRAW')"
                                        :class="currentName == 'WITHDRAW' ? 'clickCurrent' : ''"
                                        type="text">WITHDRAW</el-button>
                         </el-button-group>
@@ -284,16 +288,6 @@ height: 132px;">
                             </template>
                         </el-table-column>
                     </el-table>
-                    <!-- <ul class="HistoryList">
-                        <li v-for="(item, index) in historyListData"
-                            :key="index">
-                            <i class="face"><img src="@/assets/images/face.png"></i>
-                            <p>{{ item.userAddress }} </p>
-                            <div :class="item.btn == 'Lend' ? 'btn' : 'HARVEST'">{{ item.btn }}</div>
-                            <h4>{{ item.amount }} ETH</h4>
-                            <p class="time">{{ item.timestamp }}</p>
-                        </li>
-                    </ul> -->
                 </div>
             </div>
             <div class="overViewBox">
@@ -360,26 +354,30 @@ export default {
     watch: {
         accountFilter (newData) {
             if (newData) {
-                this.getHistoryList()
                 this.isSubmit = true
                 userStaked(this.account).then(res => {
                     this.staked = res[0]
+                    this.staking = res[1]
                 })
                 this.getPendingReward()
                 this.getUserSBTID()
+                this.getHistoryList()
             }
         }
     },
     mounted () {
         this.initSwiper()
         if (this.accountFilter) {
-            this.getHistoryList()
             this.isSubmit = true
             userStaked(this.account).then(res => {
                 this.staked = res[0]
+                this.staking = res[1]
             })
             this.getPendingReward()
+            this.getHistoryList()
         }
+        document.getElementsByClassName('swiper-pagination-current')[0].style.paddingRight = '70px'
+        document.getElementsByClassName('swiper-pagination-total')[0].style.paddingLeft = '70px'
     },
     destroyed () {
         clearInterval(this.timer)
@@ -417,20 +415,21 @@ export default {
             })
         },
         SUBMIT () {
-            this.isSubmit = false
             if (this.staked) {
                 this.getPendingReward()
             } else {
-                stake().catch((err) => {
-                    console.log(err)
+                stake().then((res) => {
+                    if (!res) {
+                        this.isSubmit = false
+                        this.showCongratulationsDialog()
+                    }
                 })
-                this.showCongratulationsDialog()
             }
         },
         showCongratulationsDialog () {
             this.timer = setInterval(() => {
                 userStaked(this.account).then(res => {
-                    if (res[1]) {
+                    if (res[0] && res[1]) {
                         this.$refs.CongratulationsDialog.showDialog()
                         clearInterval(this.timer)
                         this.timer = null
@@ -460,6 +459,7 @@ export default {
         // 获取历史信息
         getHistoryList () {
             getTransctions().then((resPromise) => {
+                console.log(resPromise)
                 const ethers = require('ethers');
                 const newArry = []
                 resPromise.forEach(transaction => {
@@ -518,7 +518,7 @@ export default {
     width: 8px // 横向滚动条
     height: 8px // 纵向滚动条必写
 // 2、定义滚动条轨道 内阴影+圆角
-:deep  .el-table__body-wrapper::-webkit-scrollbar-track
+:deep .el-table__body-wrapper::-webkit-scrollbar-track
     box-shadow: 0px 1px 3px #E1EBF2 inset
     border-radius: 6px
     background-color: #E1EBF2
@@ -543,7 +543,7 @@ export default {
         transform: translate(-50%, -50%)
         color: #FFF
         text-align: center
-        font-family: "Plus Jakarta Sans"
+        font-family: "PPlusJakartaSansRegular"
         font-size: 96px
         font-style: normal
         font-weight: 800
@@ -604,23 +604,16 @@ export default {
     font-size: 25px !important
     font-weight: 700
 
-.swiper-button-prev,
-.swiper-button-next
+.swiper-button-prev
     top: calc(100% - 18px) !important
+.swiper-button-next
+    top: calc(100% - 21px) !important
 
 .swiper-button-prev
     left: 38% !important
 
 .swiper-button-next
     right: 38% !important
-::v-depp.swiper-pagination > .swiper-pagination-total
-    padding-left: 70px!important
-
-::v-depp.swiper-pagination > .swiper-pagination-current
-    padding-right: 70px!important
-.swiperBox .swiper-pagination-current
-    font-size: 20px !important
-
 .content
     display: flex
     justify-content: space-between
@@ -657,7 +650,7 @@ export default {
 .contentLeft h3
     padding: 19px 0 20px 0
     color: var(--TEXT_BLACK, #282828)
-    font-family: "PlusJakartaSansRegular"
+    font-family: "PlusJakartaSansBlod"
     font-size: 40px
     font-style: normal
     font-weight: 800
@@ -666,14 +659,12 @@ export default {
     letter-spacing: -0.4px
 
 .contentLeft h4
-    color: var(--MAIN_BLUE, #3259b4)
-    /* heading_small */
-    font-family: "Noto Sans"
+    color: var(--MAIN_BLUE, #325AB4)
+    font-family: "NotoSans-Blod"
     font-size: 20px
     font-style: normal
     font-weight: 700
     line-height: 180%
-    /* 36px */
     letter-spacing: 0.6px
 
 .contentLeft p
@@ -951,7 +942,7 @@ export default {
         height: 180px
 
     & .icon img
-        width: 60%
+        width: 100%
 
     & .text
         width: calc(100% - 220px)
@@ -1101,7 +1092,7 @@ export default {
     & li h3
         color: #282828
         /* heading_en-only */
-        font-family: "Plus Jakarta Sans"
+        font-family: "PlusJakartaSansRegulars"
         font-size: 40px
         font-style: normal
         font-weight: 800
@@ -1130,4 +1121,13 @@ export default {
     background-color: #325AB4
 :deep .el-slider__bar
     background-color: transparent
+.bannerText h3
+    color: #FFF
+    text-align: center
+    font-family: "PlusJakartaSansBlod"
+    font-size: 96px
+    font-style: normal
+    font-weight: 800
+    line-height: 130%
+    letter-spacing: -0.96px
 </style>
