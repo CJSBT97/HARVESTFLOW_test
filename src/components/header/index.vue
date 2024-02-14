@@ -35,7 +35,7 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
-import { getAccounts } from '@/utils/ethers'
+import { getAccounts, setupNetwork } from '@/utils/ethers'
 export default {
     // eslint-disable-next-line vue/multi-word-component-names
     name: 'Header',
@@ -91,8 +91,11 @@ export default {
         },
     },
     methods: {
-        connectWallet () {
-            getAccounts().catch();
+        async connectWallet () {
+            const res = await setupNetwork()
+            if (res){
+                getAccounts().catch();
+            }
         }
     }
 }
