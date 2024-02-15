@@ -3,11 +3,13 @@
         <div v-show="isTrue"
              class="follow center">
             <p>HARVEST FLOW is currently on testnet. Stay tuned for more exciting projects coming your way in Spring 2024!</p>
-            <a href="#"> Follow X > </a>
+            <a href="https://twitter.com/HarvestFlow_io"
+               target="_blank"> Follow X > </a>
         </div>
         <header class="centerBetween marginBoxHeaderFooter">
             <nav class="centerBetween">
-                <div class="logo"><img src="@/assets/images/logo.svg" /></div>
+                <div class="logo"><el-button type="text"
+                               @click="getPushHome"><img src="@/assets/images/logo.svg" /></el-button></div>
                 <a>Explore</a>
                 <a>FAQ</a>
                 <a href="https://x.com/HarvestFlow_io"
@@ -17,7 +19,7 @@
                 <template v-if="accountFilter">
                     <el-button type="text"
                                style="color: #325AB4;font-family: 'PlusJakartaSansBlod';font-size:16px;font-weight:500;"
-                               @click="$router.push('/AccountOverview')">Account Overview</el-button>
+                               @click="getPushAccountOverview">Account Overview</el-button>
                     <el-button class="Connect"
                                type="text">{{ accountFilter }}</el-button>
                 </template>
@@ -41,7 +43,8 @@ export default {
     name: 'Header',
     data () {
         return {
-            isTrue: true
+            isTrue: true,
+            timer: null
         }
     },
     computed: {
@@ -53,31 +56,31 @@ export default {
         ]),
         ...mapState('web3', ['account'])
     },
+    beforeDestroy () {
+        clearTimeout(this.timer)
+        this.timer = null
+    },
     mounted () {
         if (this.$route.path == '/AccountOverview') {
             this.isTrue = false
         } else {
             this.isTrue = true
         }
-        // this.$store.dispatch('user/getInfo')
         // 监听账户变化事件
         window.ethereum.on('accountsChanged', (accounts) => {
             if (accounts.length === 0) {
-                console.log("用户已断开连接");
+
                 this.$store.commit('web3/saveAccountFilter', null)
                 this.$store.commit('web3/accountFilter', null)
             } else {
+                this.connectWallet()
                 console.log("用户已连接，当前账户:", accounts[0]);
             }
         });
         // 监听网络变化事件
         window.ethereum.on('chainChanged', (chainId) => {
             // 当用户切换网络时，会触发该事件 重新链接钱包
-            // this.$store.dispatch('user/resetToken')
-            // this.$store.dispatch('user/login')
-            this.$store.commit('web3/saveAccountFilter', null)
-            this.$store.commit('web3/accountFilter', null)
-            getAccounts().catch();
+            this.connectWallet()
             console.log("用户已切换网络，当前网络ID:", chainId);
         });
     },
@@ -93,8 +96,29 @@ export default {
     methods: {
         async connectWallet () {
             const res = await setupNetwork()
-            if (res){
+            if (res) {
                 getAccounts().catch();
+                if (this.timer != null) {
+                    clearTimeout(this.timer)
+                    this.timer = null
+                }
+                this.timer = setTimeout(() => {
+                    removeToken()
+                    this.$store.commit('web3/saveAccount', null)
+                    this.$store.commit('web3/saveAccountFilter', null)
+                    clearTimeout(this.timer)
+                    this.timer = null
+                }, 60 * 60 * 1000);
+            }
+        },
+        getPushHome () {
+            if (this.$route.path != '/home') {
+                this.$router.push('/home')
+            }
+        },
+        getPushAccountOverview () {
+            if (this.$route.path != '/AccountOverview') {
+                this.$router.push('/AccountOverview')
             }
         }
     }

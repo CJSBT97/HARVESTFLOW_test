@@ -16,8 +16,10 @@
                     <h3>{{getEth}}ETH</h3>
                     <div class="text-btn">
                         <h3>NEXT HARVEST <span>Mar. 31, 2024</span></h3>
+                        <!-- :class="getEth == 0 ? 'isZero' : ''" -->
                         <el-button @click="harvest"
-                                   :class="getEth == 0 ? 'isZero' : ''"
+                                   disabled
+                                   class="isZero"
                                    type="text">HARVEST</el-button>
                     </div>
                 </div>
@@ -28,7 +30,8 @@
                              alt=""></div>
                     <div class="articletext">
                         <h3>Vehicle Leasing Project to Support Drivers in South East Asia</h3>
-                        <el-button type="text">Project Detail ></el-button>
+                        <el-button type="text"
+                                   @click="$router.push('/home')">Project Detail ></el-button>
                     </div>
                 </div>
             </el-card>
@@ -225,12 +228,15 @@
                     <div class="title">
                         <div class="title-text">
                             <h3>MY NFT</h3>
-                            <p>#1</p>
+                            <p>#{{ userSBTID }}</p>
                         </div>
                     </div>
-                    <el-card>
+                    <el-card style="position: relative;">
+                        <not-mint v-if="userSBTID == null"></not-mint>
                         <div class="mynftCard">
-                            <div class="mynftCard-img"></div>
+                            <div class="mynftCard-img">
+                                <img src="@/assets/images/nftcar.gif">
+                            </div>
                             <div class="mynftCard-text">
                                 <div>
                                     <p class="color999">LENDING AMOUNT</p>
@@ -251,7 +257,7 @@
                                     </li>
                                     <li>
                                         <p class="color999">RARITY</p>
-                                        <div><img src="@/assets/images/blrst.svg"><span>Testnet</span></div>
+                                        <div style="display: flex;"><img src="@/assets/images/blrst.svg"><span>Testnet(SBT)</span></div>
                                     </li>
                                 </ul>
                             </div>
@@ -268,7 +274,8 @@
                         <div class="centerBetween updateItem">
                             <span class="time">2024.2.12</span>
                             <h3>We are joining Blast Big Bang Competition!!</h3>
-                            <el-button type="text"> <img src="@/assets/images/updateIcon.svg"> </el-button>
+                            <a href="https://twitter.com/HarvestFlow_io/status/1757405327320903705"
+                               target="_blank"><img src="@/assets/images/updateIcon.svg"></a>
                         </div>
                     </el-card>
                 </div>
@@ -283,20 +290,22 @@ import { mapGetters, mapState } from 'vuex'
 import { claim } from '@/utils/contract'
 import ModalDialog from './components/modal';
 import * as echarts from 'echarts';
-import { getPendingReward, userStaked } from '@/utils/contract'
+import { getPendingReward, userStaked, userSBTID, SBTUrl } from '@/utils/contract'
 import { truncateString, daysSince } from '@/utils/app';
 import COMINGSOON from './components/COMINGSOON'
+import NotMint from './components/notMint.vue';
 export default {
     name: 'AccountOverview',
     components: {
         COMINGSOON,
-        ModalDialog
+        ModalDialog,
+        NotMint
     },
     computed: {
         ...mapGetters([
             'accountFilter'
         ]),
-        ...mapState('web3', ['account'])
+        ...mapState('web3', ['account', 'userSBTID', 'SBTUrl'])
     },
     data () {
         return {
@@ -387,6 +396,7 @@ export default {
             }],
             getEth: 0,
             timer: null,
+            timer2: null,
             timeDate: null
         }
     },
@@ -412,21 +422,14 @@ export default {
     destroyed () {
         clearInterval(this.timer)
         this.timer = null
+        clearInterval(this.timer2)
+        this.timer2 = null
     },
     methods: {
         initEchartPortfolio () {
             const myChart = echarts.init(this.$refs.Portfolio);
-            const color = new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                offset: 0,
-                color: '#325AB4'   // 渐变色起始颜色
-            }, {
-                offset: 0.5,
-                color: '#325AB4'   // 渐变色起始颜色
-            }, {
-                offset: 1,
-                color: '#1C1C64'   // 渐变色结束颜色
-            }]);
             const option = {
+                backgroundColor: 'transparent',
                 grid: { // 设置网格区域
                     width: '92%', // 设置宽度为80%
                     height: '92%', // 设置高度为60%
@@ -468,8 +471,18 @@ export default {
                         data: [520, 520, 520, 920, 920, 920, 920, 920, 1520, 1520],
                         type: 'line',
                         areaStyle: {
-                            color: color, // 设置面积图的颜色为渐变色
-                            borderRadius: [15, 15, 15, 15]
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                {
+                                    offset: 0,
+                                    color: '#325AB4 '
+                                },
+                                {
+                                    offset: 1,
+                                    color: '#1C1C64 '
+                                }
+                            ]),
+                            borderRadius: [15, 15, 15, 15],
+                            opacity: 1
                         },
                         step: true,
                     }
@@ -534,9 +547,19 @@ export default {
                         data: PrincipalData,
                         xAxisIndex: 0,
                         itemStyle: {
-                            color: '#1C1C64',
+                            color: new echarts.graphic.LinearGradient(0, 1, 0, 0, [
+                                {
+                                    offset: 0,
+                                    color: '#1C1C64'
+                                },
+                                {
+                                    offset: 1,
+                                    color: '#325AB4'
+                                }
+                            ]),
                             barBorderRadius: [8, 8, 0, 0]
                         },
+                        zlevel: 9
                     },
                     {
                         name: 'Interest',
@@ -545,10 +568,10 @@ export default {
                         data: InterestData,
                         xAxisIndex: 1,
                         itemStyle: {
-                            color: 'rgba(207,227,252,0.7)',
+                            color: '#82A5BE',
                             barBorderRadius: [8, 8, 0, 0]
                         },
-                        zlevel: 9
+
                     },
                     { name: '', type: 'bar', show: false, barWidth: '20%', data: [0, 0, 0, 0], xAxisIndex: 0 },
                     { name: '', type: 'bar', show: false, barWidth: '20%', data: [0, 0, 0, 0], xAxisIndex: 1 },
@@ -572,7 +595,7 @@ export default {
             getPendingReward(this.account).then((res) => {
                 if (res) {
                     this.getEth = String(res)
-                    this.timer = setInterval(() => {
+                    this.timer2 = setInterval(() => {
                         this.getEth = String(res)
                     }, 36000);
                 }
@@ -580,7 +603,7 @@ export default {
         },
         userStaked () {
             userStaked(this.account).then(res => {
-                if (res[0]) {
+                if (res[0] && res[1]) {
                     this.timeDate = daysSince(Number(res[2]) * 1000)
                     this.getEth = (0.001 * 0.05 / 365 * daysSince(Number(res[2]) * 1000)).toFixed(15)
                     this.timer = setInterval(() => {
@@ -588,6 +611,14 @@ export default {
                             this.getEth = (this.getEth * daysSince(Number(res[2]) * 1000)).toFixed(15)
                         }
                     }, 3600000);
+                    userSBTID(this.account).then(res => {
+                        if (Number(res) != 0) {
+                            this.$store.commit('web3/saveuserSBTID', Number(res))
+                            SBTUrl(res).then(e => {
+                                this.$store.commit('web3/saveSBTUrl', e)
+                            })
+                        }
+                    })
                 }
             })
         },
@@ -919,9 +950,9 @@ export default {
     & .tableHouse
         width: 70%
 .mynft
-    width: 23%
+    width: 30%
 .update
-    width: 75%
+    width: 68%
     & .updateItem
         padding: 30px
         & .time
@@ -937,7 +968,7 @@ export default {
             text-overflow: ellipsis
 .mynftCard
     & .mynftCard-text
-        padding: 30px
+        padding: 10px
         box-sizing: border-box
         & > div h3
             color: #282828
@@ -948,6 +979,8 @@ export default {
             display: flex
             & > li
                 width: 30%
+                display: flex
+                flex-direction: column
                 & img
                     width: 51%
                     display: inline-block
@@ -956,9 +989,11 @@ export default {
     & .mynftCard-img
         height: 280px
         border-radius: 15px 15px 0 0
-        background-image: url(~@/assets/images/nftcar.png)
-        background-size: 100%
-        background-position: center
+        overflow: hidden
+        img
+            height: 100%
+            object-fit: cover
+
 .Portfolio
     .dataText
         position: absolute

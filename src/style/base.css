@@ -43,6 +43,10 @@ img {
     font-family: 'Noto Sans';
     src: url('../assets/font/NotoSans-Regular.ttf') format('truetype');
 }
+@font-face {
+    font-family: 'NotoSans-Blod';
+    src: url('../assets/font/NotoSans-Bold.ttf') format('truetype');
+}
 
 
 header nav >* , footer nav >*{
@@ -84,7 +88,7 @@ footer {
 
 footer p {
     color:  #282828;
-    font-family: "Plus Jakarta Sans";
+    font-family: "PlusJakartaSansRegular";
     font-size: 12px;
     font-style: normal;
     font-weight: 400;
