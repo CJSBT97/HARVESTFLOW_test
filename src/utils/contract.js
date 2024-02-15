@@ -4,7 +4,6 @@ import { setupNetwork, waitForTx } from './ethers'
 import { CONTRACT_ADDRESS, STAKE_AMOUNT } from '@/config'
 const ethers = require('ethers');
 
-
 /**
  * 获取质押合约
  * @returns
