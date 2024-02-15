@@ -231,7 +231,8 @@
                             <p>#{{ userSBTID }}</p>
                         </div>
                     </div>
-                    <el-card>
+                    <el-card style="position: relative;">
+                        <not-mint v-if="userSBTID == null"></not-mint>
                         <div class="mynftCard">
                             <div class="mynftCard-img">
                                 <img src="@/assets/images/nftcar.gif">
@@ -292,11 +293,13 @@ import * as echarts from 'echarts';
 import { getPendingReward, userStaked, userSBTID, SBTUrl } from '@/utils/contract'
 import { truncateString, daysSince } from '@/utils/app';
 import COMINGSOON from './components/COMINGSOON'
+import NotMint from './components/notMint.vue';
 export default {
     name: 'AccountOverview',
     components: {
         COMINGSOON,
-        ModalDialog
+        ModalDialog,
+        NotMint
     },
     computed: {
         ...mapGetters([
@@ -401,14 +404,6 @@ export default {
         accountFilter (newData) {
             if (newData) {
                 this.userStaked()
-                userSBTID(this.account).then(res => {
-                    if (Number(res) != 0) {
-                        this.$store.commit('web3/saveuserSBTID', Number(res))
-                        SBTUrl(res).then(e => {
-                            this.$store.commit('web3/saveSBTUrl', e)
-                        })
-                    }
-                })
                 // this.getPendingReward()
             }
         }
@@ -608,7 +603,7 @@ export default {
         },
         userStaked () {
             userStaked(this.account).then(res => {
-                if (res[0]) {
+                if (res[0] && res[1]) {
                     this.timeDate = daysSince(Number(res[2]) * 1000)
                     this.getEth = (0.001 * 0.05 / 365 * daysSince(Number(res[2]) * 1000)).toFixed(15)
                     this.timer = setInterval(() => {
@@ -616,6 +611,14 @@ export default {
                             this.getEth = (this.getEth * daysSince(Number(res[2]) * 1000)).toFixed(15)
                         }
                     }, 3600000);
+                    userSBTID(this.account).then(res => {
+                        if (Number(res) != 0) {
+                            this.$store.commit('web3/saveuserSBTID', Number(res))
+                            SBTUrl(res).then(e => {
+                                this.$store.commit('web3/saveSBTUrl', e)
+                            })
+                        }
+                    })
                 }
             })
         },
