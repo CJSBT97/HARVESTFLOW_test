@@ -16,6 +16,8 @@ Vue.prototype.web3 = web3
 // 引入 swiper.css
 import "swiper/css/swiper.css";
 
+Vue.prototype.$bus = new Vue()
+
 Vue.config.productionTip = false
 
 

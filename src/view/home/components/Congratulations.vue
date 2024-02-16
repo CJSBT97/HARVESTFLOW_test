@@ -7,7 +7,8 @@
                 <div class="title">
                     <h3>Congratulations!</h3>
                     <p>Your NFT has successfully been minted!!</p>
-                    <span>Transaction:{{ Transaction }}</span>
+                    <span><a target="_blank"
+                           :href="`https://testnet.blastscan.io/nft/0x4d4679Bd8EA26070340eaE9b5c5564D6Dc5d2AD5/${userSBTID}`">Transaction:{{ Transaction }}</a></span>
                 </div>
                 <div class="mynftCard">
                     <div class="mynftCard-img">

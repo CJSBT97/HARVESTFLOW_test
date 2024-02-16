@@ -68,14 +68,15 @@ export const setupNetwork = async () => {
 
 export const getAccounts = async () => {
     let ethereum = window.ethereum;
-    if (store.state.web3.account) {
-        return store.state.web3.account;
-    }
+    // if (store.state.web3.account) {
+    //     return store.state.web3.account;
+    // }
     const accounts = await ethereum.request({ method: 'eth_requestAccounts' })
     let account = accounts[0]
     account = ethers.getAddress(account)
     setToken(account)
     setTime(new Date().getTime())
+    // console.log('account', account)
     store.commit('web3/saveAccount', account)
     store.commit('web3/saveAccountFilter', truncateString(account))
     return account

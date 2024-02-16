@@ -8,6 +8,9 @@
                     South East Asia
                 </h3>
             </div>
+            <el-button class="bannerBtn"
+                       type="text"
+                       @click.prevent="StartLending">Start Lending</el-button>
             <p class="text">Tentative: All images and contents will be updated later.</p>
         </div>
         <div class="swiperBox marginUp">
@@ -122,6 +125,7 @@ height: 132px;">
                     <h3>28th Feb. 2025</h3>
                 </div>
                 <div class="column"
+                     id="targetSumbit"
                      style="margin-top: 48px;">PAYMENT</div>
                 <div class="PAYMENT">
                     <isPAYMENT v-show="!accountFilter"></isPAYMENT>
@@ -163,7 +167,8 @@ height: 132px;">
                             We are not responsible for any damage caused by these issues.
                         </p>
                         <el-button class="submit"
-                                   @click="SUBMIT">SUBMIT</el-button>
+                                   @click="SUBMIT"
+                                   :loading="isSubmitLogin">SUBMIT</el-button>
                     </template>
                     <template v-else>
                         <p class="color999"
@@ -348,6 +353,7 @@ export default {
             getEth: '-',  // 更新每天收益的值
             staked: false, // 表示用户执行过质押
             staking: false, // 表示用户质押后取消了质押
+            isSubmitLogin: false, // 记录用户点击质押后不允许再次点击
             timer: null
         }
     },
@@ -376,6 +382,7 @@ export default {
             this.getPendingReward()
             this.getHistoryList()
         }
+        this.$bus.$on('StartLending', this.StartLending)
         document.getElementsByClassName('swiper-pagination-current')[0].style.paddingRight = '70px'
         document.getElementsByClassName('swiper-pagination-total')[0].style.paddingLeft = '70px'
     },
@@ -414,22 +421,24 @@ export default {
                 // },
             })
         },
+        // 质押
         SUBMIT () {
-            if (this.staked) {
-                this.getPendingReward()
-            } else {
-                stake().then((res) => {
-                    if (!res) {
-                        this.isSubmit = false
-                        this.showCongratulationsDialog()
-                    }
-                })
-            }
+            this.isSubmitLogin = true
+            stake().then((res) => {
+                if (!res) {
+                    this.showCongratulationsDialog()
+                } else {
+                    this.isSubmitLogin = false
+                }
+            })
         },
         showCongratulationsDialog () {
             this.timer = setInterval(() => {
                 userStaked(this.account).then(res => {
                     if (res[0] && res[1]) {
+                        this.isSubmit = false
+                        this.isSubmitLogin = false
+                        this.getPendingReward()
                         this.$refs.CongratulationsDialog.showDialog()
                         clearInterval(this.timer)
                         this.timer = null
@@ -437,10 +446,13 @@ export default {
                 })
             }, 3600)
         },
+        // 获取奖励数量
         getPendingReward () {
             getPendingReward(this.account).then((res) => {
                 if (Number(res) > 0) {
                     this.getEth = Number(res).toFixed(15)
+                } else {
+                    this.getEth = '-'
                 }
             })
         },
@@ -459,7 +471,6 @@ export default {
         // 获取历史信息
         getHistoryList () {
             getTransctions().then((resPromise) => {
-                console.log(resPromise)
                 const ethers = require('ethers');
                 const newArry = []
                 resPromise.forEach(transaction => {
@@ -492,6 +503,7 @@ export default {
 
             })
         },
+        // 获取ntfID
         getUserSBTID () {
             userSBTID(this.account).then(res => {
                 if (Number(res) != 0) {
@@ -501,6 +513,13 @@ export default {
                     })
                 }
             })
+        },
+        StartLending () {
+            document.querySelector("#targetSumbit").scrollIntoView(true);
+            // const anchorLink = document.createElement('a');
+            // anchorLink.href = '#targetSumbit'; // 设置链接到目标锚点
+            // anchorLink.click(); // 模拟点击
+            // anchorLink.remove();
         }
     }
 }
@@ -543,7 +562,7 @@ export default {
         transform: translate(-50%, -50%)
         color: #FFF
         text-align: center
-        font-family: "PPlusJakartaSansRegular"
+        font-family: "PlusJakartaSansRegular"
         font-size: 96px
         font-style: normal
         font-weight: 800
@@ -564,6 +583,20 @@ export default {
 
     & img
         width: 100%
+    & .bannerBtn
+        position: absolute
+        width: 20%
+        bottom: 20%
+        left: 50%
+        border-radius: 100px
+        transform: translate(-50%, -20%)
+        color: #FFF
+        font-family: "PlusJakartaSansRegular"
+        font-size: 25px
+        line-height: 180%
+        letter-spacing: 0.39px
+        font-weight: 800
+        background: linear-gradient(to right, #FFD700, #FFA500)
 
 .swiperBox
     overflow: hidden
@@ -1015,7 +1048,8 @@ export default {
     color: #fff
     padding: 4px 12px
     border-radius: 100px
-    background: linear-gradient(0deg, rgba(50, 89, 180, 0.25) 0%, rgba(50, 89, 180, 0.25) 100%), linear-gradient(82deg, #30BAE6 -0.19%, #D6ACFF 99.05%)
+    background: linear-gradient(to right, #FFD700, #FFA500)
+    // background: linear-gradient(0deg, rgba(50, 89, 180, 0.25) 0%, rgba(50, 89, 180, 0.25) 100%), linear-gradient(82deg, #30BAE6 -0.19%, #D6ACFF 99.05%)
 
 .HistoryList h4
     color: var(--TEXT_BLACK, #282828)

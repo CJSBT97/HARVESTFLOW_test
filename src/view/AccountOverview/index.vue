@@ -228,10 +228,12 @@
                     <div class="title">
                         <div class="title-text">
                             <h3>MY NFT</h3>
-                            <p>#{{ userSBTID }}</p>
+                            <p v-show="userSBTID"><a target="_blank"
+                                   :href="`https://testnet.blastscan.io/nft/0x4d4679Bd8EA26070340eaE9b5c5564D6Dc5d2AD5/${userSBTID}`">#{{ userSBTID }}</a></p>
                         </div>
                     </div>
-                    <el-card style="position: relative;">
+                    <el-card style="position: relative;"
+                             :style="{'marginTop': userSBTID == null ? '25px' : '0px'}">
                         <not-mint v-if="userSBTID == null"></not-mint>
                         <div class="mynftCard">
                             <div class="mynftCard-img">
@@ -619,6 +621,10 @@ export default {
                             })
                         }
                     })
+                } else {
+                    this.getEth = 0
+                    this.$store.commit('web3/saveuserSBTID', null)
+                    this.$store.commit('web3/saveSBTUrl', null)
                 }
             })
         },
@@ -857,9 +863,11 @@ export default {
         line-height: 180%
         letter-spacing: 0.6px
         border-radius: 100px
-        background: var(--HAPPY_GRADIENT, linear-gradient(0deg, rgba(50, 89, 180, 0.25) 0%, rgba(50, 89, 180, 0.25) 100%), linear-gradient(82deg, #30BAE6 -0.19%, #D6ACFF 99.05%))
+        background: linear-gradient(to right, #FFD700, #FFA500)
+        // background: var(--HAPPY_GRADIENT, linear-gradient(0deg, rgba(50, 89, 180, 0.25) 0%, rgba(50, 89, 180, 0.25) 100%), linear-gradient(82deg, #30BAE6 -0.19%, #D6ACFF 99.05%))
         &:hover
-            background: linear-gradient(82.38deg, #30BAE6 -0.19%, #D6ACFF 99.05%),linear-gradient(0deg, rgba(50, 89, 180, 0.25), rgba(50, 89, 180, 0.25))
+            background: linear-gradient(to right, #FFD700, #FFA500)
+            // background: linear-gradient(82.38deg, #30BAE6 -0.19%, #D6ACFF 99.05%),linear-gradient(0deg, rgba(50, 89, 180, 0.25), rgba(50, 89, 180, 0.25))
     & .isZero
         background: linear-gradient(82deg, rgba(139, 139, 139, 0.50) -0.19%, rgba(214, 214, 214, 0.50) 99.05%)
 

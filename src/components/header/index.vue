@@ -14,6 +14,10 @@
                 <a>FAQ</a>
                 <a href="https://x.com/HarvestFlow_io"
                    target="_blank"><img src="@/assets/images/X.svg" /></a>
+                <el-button v-show="isTrue"
+                           class="bannerBtn"
+                           @click="StartLending"
+                           type="text">Start Lending</el-button>
             </nav>
             <div class="info centerBetween">
                 <template v-if="accountFilter">
@@ -120,6 +124,9 @@ export default {
             if (this.$route.path != '/AccountOverview') {
                 this.$router.push('/AccountOverview')
             }
+        },
+        StartLending () {
+            this.$bus.$emit('StartLending')
         }
     }
 }
@@ -184,4 +191,16 @@ header
     &:hover
         color: #fff
         background-color: #325AB4
+.bannerBtn
+    width: 25%
+    border-radius: 100px
+    color: #FFF
+    font-family: "PlusJakartaSansRegular"
+    font-size: 16px
+    // line-height: 180%
+    letter-spacing: 0.39px
+    // font-weight: 800
+    background: linear-gradient(to right, #FFD700, #FFA500)
+.el-button--text:focus, .el-button--text:hover
+    color: #fff
 </style>
